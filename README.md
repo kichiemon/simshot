@@ -57,6 +57,14 @@ npx skills add kichiemon/simshot
 
 Installs simshot as a reusable agent skill (for Claude Code / opencode and other skill-aware agents). Once installed, skill-aware agents can use simshot automatically — just ask it to capture App Store screenshots, and the agent builds and runs `simshot shoot` for you (see [`skills/simshot/SKILL.md`](skills/simshot/SKILL.md)).
 
+Target a specific agent, for example **OpenAI Codex**:
+
+```bash
+npx skills add kichiemon/simshot -a codex
+```
+
+This installs the skill into `.agents/skills/` (Codex's project skill directory). The skill is kept in sync across three locations — `skills/simshot/SKILL.md` (canonical), `.claude/skills/simshot/SKILL.md` (Claude Code), and `.agents/skills/simshot/SKILL.md` (Codex and other `.agents/skills/` agents) — so all skill-aware agents get identical instructions.
+
 ### Build from source
 
 ```bash
