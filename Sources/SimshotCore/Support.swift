@@ -70,4 +70,4 @@ public enum Log {
 }
 
 /// The current simshot semantic version.
-public let simshotVersion = "0.1.0"
+public let simshotVersion = "0.1.1"
