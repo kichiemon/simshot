@@ -1,6 +1,11 @@
 import Foundation
 
+/// A simulator device discovered via `simctl list`, with name/UDID and the
+/// iOS runtime version it belongs to.
 public struct Simulator: Equatable {
+    /// A UUID-formatted UDID token, e.g. `FEDCBA98-7654-3210-...`.
+    static let udidPattern = #"^[0-9A-Fa-f]{8}-[0-9A-Fa-f-]{27}$"#
+
     public let name: String
     public let udid: String
     let runtimeComponents: [Int]
@@ -24,9 +29,14 @@ public struct Simulator: Equatable {
         return allowed.isEmpty ? udid : allowed
     }
 
+    /// Whether a CLI token is a full UUID-formatted UDID (vs. a device name).
+    public static func isUDID(_ token: String) -> Bool {
+        token.range(of: udidPattern, options: .regularExpression) != nil
+    }
+
     // MARK: - Listing & resolution
 
-    /// Parse `simctl list devices available -j`.
+    /// Parse `simctl list devices available -j` into available simulators.
     public static func listAvailable() throws -> [Simulator] {
         let result = try ProcessRunner.run(
             "/usr/bin/xcrun", ["simctl", "list", "devices", "available", "-j"],
@@ -58,13 +68,14 @@ public struct Simulator: Equatable {
     }
 
     /// Resolve a CLI token (device name or UDID) to a concrete simulator.
+    ///
     /// Duplicate names across iOS runtimes are de-duplicated in favor of the
     /// newest runtime, so `--devices iphone-17-pro-max` just works.
     public static func resolve(_ token: String) throws -> Simulator {
         let devices = try listAvailable()
 
         // Full UUID -> exact match.
-        if token.range(of: #"^[0-9A-Fa-f]{8}-[0-9A-Fa-f-]{27}$"#, options: .regularExpression) != nil {
+        if isUDID(token) {
             if let device = devices.first(where: { $0.udid.lowercased() == token.lowercased() }) {
                 return device
             }
@@ -119,6 +130,7 @@ public struct Simulator: Equatable {
 
     // MARK: - simctl operations
 
+    /// Boot the simulator (waiting until boot completes).
     public func boot(timeout: TimeInterval = 180) throws {
         Log.info("🚀 Booting \(name) (\(udid))...")
         let result = try ProcessRunner.run(
@@ -130,6 +142,7 @@ public struct Simulator: Equatable {
         }
     }
 
+    /// Override the status bar so captures show a clean clock/battery.
     public func overrideStatusBar(
         time: String = "9:41",
         batteryLevel: Int = 100,
@@ -154,6 +167,7 @@ public struct Simulator: Equatable {
         }
     }
 
+    /// Restore the default status bar. Failures are ignored.
     public func clearStatusBar() {
         _ = try? ProcessRunner.run(
             "/usr/bin/xcrun", ["simctl", "status_bar", udid, "clear"],
@@ -161,6 +175,7 @@ public struct Simulator: Equatable {
         )
     }
 
+    /// Uninstall the app if present. Failures are ignored (fresh installs).
     public func uninstallApp(bundleID: String) {
         let result = try? ProcessRunner.run(
             "/usr/bin/xcrun", ["simctl", "uninstall", udid, bundleID],
@@ -171,6 +186,7 @@ public struct Simulator: Equatable {
         }
     }
 
+    /// Install the `.app` bundle, retrying once on transient failure.
     public func installApp(_ appURL: URL) throws {
         Log.info("📲 Installing \(appURL.lastPathComponent)...")
         var lastError = ""
@@ -187,6 +203,7 @@ public struct Simulator: Equatable {
         throw SimshotError.commandFailed("simctl install failed for \(name):\n\(lastError)")
     }
 
+    /// Launch the app with the screenshot scene arguments, retrying on failure.
     public func launch(bundleID: String, arguments: [String], retries: Int = 2, timeout: TimeInterval = 60) throws {
         var lastError = ""
         for attempt in 1...max(1, retries) {
@@ -205,6 +222,7 @@ public struct Simulator: Equatable {
         throw SimshotError.commandFailed("simctl launch failed for \(bundleID) on \(name):\n\(lastError)")
     }
 
+    /// Terminate the app. Failures are ignored.
     public func terminate(bundleID: String) {
         _ = try? ProcessRunner.run(
             "/usr/bin/xcrun", ["simctl", "terminate", udid, bundleID],
@@ -212,6 +230,7 @@ public struct Simulator: Equatable {
         )
     }
 
+    /// Capture a screenshot to `url`, retrying on transient failure.
     public func screenshot(to url: URL, retries: Int = 3, timeout: TimeInterval = 30) throws {
         try FileManager.default.createDirectory(
             at: url.deletingLastPathComponent(),
@@ -232,6 +251,7 @@ public struct Simulator: Equatable {
         throw SimshotError.commandFailed("simctl screenshot failed on \(name):\n\(lastError)")
     }
 
+    /// Shut the simulator down. Failures are ignored.
     public func shutdown() {
         _ = try? ProcessRunner.run(
             "/usr/bin/xcrun", ["simctl", "shutdown", udid],

@@ -49,3 +49,78 @@ final class InitConfigTests: XCTestCase {
         XCTAssertTrue(template.contains("resize: false"))
     }
 }
+
+final class InitConfigInvalidAnswersTests: XCTestCase {
+    func testTemplateWithEmptyDevicesDoesNotCrash() {
+        var answers = InitConfig.Answers.defaults
+        answers.devices = []
+        let template = InitConfig.template(answers: answers)
+        XCTAssertTrue(template.contains("devices:"), "devices key must still be present")
+        XCTAssertFalse(template.contains("  - iphone-17-pro-max"), "no device bullets expected")
+        XCTAssertFalse(template.contains("  - ipad-pro-13"), "no device bullets expected")
+    }
+
+    func testTemplateWithEmptyScenesDoesNotCrash() {
+        var answers = InitConfig.Answers.defaults
+        answers.scenes = []
+        let template = InitConfig.template(answers: answers)
+        XCTAssertTrue(template.contains("scenes:"))
+        XCTAssertFalse(template.contains("  - home"))
+    }
+
+    func testTemplateWithEmptyLanguagesDoesNotCrash() {
+        var answers = InitConfig.Answers.defaults
+        answers.languages = []
+        let template = InitConfig.template(answers: answers)
+        XCTAssertTrue(template.contains("langs:"))
+    }
+
+    func testTemplateWithEmptyListsIsWellFormed() {
+        var answers = InitConfig.Answers.defaults
+        answers.devices = []
+        answers.languages = []
+        answers.scenes = []
+        let template = InitConfig.template(answers: answers)
+        XCTAssertTrue(template.contains("devices:"))
+        XCTAssertTrue(template.contains("langs:"))
+        XCTAssertTrue(template.contains("scenes:"))
+        XCTAssertFalse(template.contains("  - "))
+        XCTAssertFalse(template.contains("--devices --langs"))
+        XCTAssertTrue(template.hasSuffix("\n"))
+    }
+
+    func testTemplateWithNilProjectAndSchemeUsesPlaceholders() {
+        var answers = InitConfig.Answers.defaults
+        answers.project = nil
+        answers.scheme = nil
+        let template = InitConfig.template(answers: answers)
+        XCTAssertTrue(template.contains("--project <project>"))
+        XCTAssertTrue(template.contains("--scheme <scheme>"))
+        XCTAssertTrue(template.contains("# project: MyApp.xcodeproj"))
+        XCTAssertTrue(template.contains("# scheme: MyApp"))
+        XCTAssertFalse(template.contains("\nproject: MyApp.xcodeproj"))
+        XCTAssertFalse(template.contains("\nscheme: MyApp"))
+    }
+
+    func testTemplateWithEmptyBundleIDStillGeneratesHeader() {
+        var answers = InitConfig.Answers.defaults
+        answers.bundleID = ""
+        let template = InitConfig.template(answers: answers)
+        XCTAssertTrue(template.contains("# simshot configuration"))
+        XCTAssertTrue(template.contains("bundle-id: "))
+    }
+
+    func testTemplateMentionsShotsOverrideForFullControl() {
+        let template = InitConfig.template(answers: .defaults)
+        XCTAssertTrue(template.contains("--shots"))
+        XCTAssertTrue(template.contains("examples/shots.json"))
+    }
+
+    func testAnswersEquatable() {
+        let a = InitConfig.Answers.defaults
+        var b = InitConfig.Answers.defaults
+        XCTAssertEqual(a, b)
+        b.scenes = ["home"]
+        XCTAssertNotEqual(a, b)
+    }
+}

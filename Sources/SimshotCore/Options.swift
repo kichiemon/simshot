@@ -1,6 +1,6 @@
 import Foundation
-import SimshotCore
 
+/// All options accepted by `simshot shoot`, as parsed from CLI arguments.
 public struct ShootOptions {
     public var project: String?
     public var workspace: String?
@@ -30,7 +30,12 @@ public struct ShootOptions {
     public init() {}
 }
 
+/// Command-line argument parsing for `simshot shoot`.
 public enum ArgParser {
+    /// Parse raw CLI arguments into a validated `ShootOptions`.
+    ///
+    /// Throws `SimshotError.usage` for unknown flags, missing values, or
+    /// missing required options.
     public static func parseShoot(_ args: [String]) throws -> ShootOptions {
         var options = ShootOptions()
         var index = 0
@@ -118,6 +123,7 @@ public enum ArgParser {
         return options
     }
 
+    /// Fill defaults and reject incomplete option sets.
     static func validate(_ options: inout ShootOptions) throws {
         if options.appPath == nil {
             guard options.project != nil || options.workspace != nil else {
@@ -146,12 +152,14 @@ public enum ArgParser {
         }
     }
 
-    static func csv(_ value: String) -> [String] {
+    /// Split a comma-separated value into trimmed, non-empty tokens.
+    public static func csv(_ value: String) -> [String] {
         value.split(separator: ",")
             .map { $0.trimmingCharacters(in: .whitespaces) }
             .filter { !$0.isEmpty }
     }
 
+    /// Parse `lang=locale,lang=locale` overrides.
     static func parseLocales(_ value: String) throws -> [String: String] {
         var result: [String: String] = [:]
         for pair in csv(value) {
@@ -164,6 +172,7 @@ public enum ArgParser {
         return result
     }
 
+    /// Load and decode a shots config file (array or `{ "shots": [...] }`).
     static func loadShots(_ path: String) throws -> [Shot] {
         let url = URL(fileURLWithPath: path)
         let data: Data

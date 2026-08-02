@@ -3,16 +3,17 @@ import Foundation
 import ImageIO
 import UniformTypeIdentifiers
 
+/// Image processing failures, with human-readable reasons.
 public enum ResizerError: Error, CustomStringConvertible {
-    case loadFailed(URL)
-    case writeFailed(URL)
+    case loadFailed(URL, String)
+    case writeFailed(URL, String)
 
     public var description: String {
         switch self {
-        case .loadFailed(let url):
-            return "Failed to load image: \(url.path)"
-        case .writeFailed(let url):
-            return "Failed to write image: \(url.path)"
+        case .loadFailed(let url, let reason):
+            return "Failed to load image \(url.path): \(reason)"
+        case .writeFailed(let url, let reason):
+            return "Failed to write image \(url.path): \(reason)"
         }
     }
 }
@@ -20,15 +21,24 @@ public enum ResizerError: Error, CustomStringConvertible {
 /// Pure-Swift image processing (CoreGraphics/ImageIO — no PIL dependency):
 /// alpha flattening and App Store size resizing.
 public enum Resizer {
+    /// Load a `CGImage` from a PNG/JPEG/etc. file.
     public static func loadCGImage(at url: URL) throws -> CGImage {
+        guard FileManager.default.fileExists(atPath: url.path) else {
+            throw ResizerError.loadFailed(url, "no such file")
+        }
+        var isDirectory: ObjCBool = false
+        if FileManager.default.fileExists(atPath: url.path, isDirectory: &isDirectory), isDirectory.boolValue {
+            throw ResizerError.loadFailed(url, "path is a directory, expected an image file")
+        }
         guard let source = CGImageSourceCreateWithURL(url as CFURL, nil),
             let image = CGImageSourceCreateImageAtIndex(source, 0, nil)
         else {
-            throw ResizerError.loadFailed(url)
+            throw ResizerError.loadFailed(url, "unsupported or corrupt image data")
         }
         return image
     }
 
+    /// Whether the image carries an alpha channel.
     public static func hasAlpha(_ image: CGImage) -> Bool {
         switch image.alphaInfo {
         case .premultipliedLast, .premultipliedFirst, .last, .first:
@@ -67,14 +77,21 @@ public enum Resizer {
         return context.makeImage() ?? image
     }
 
+    /// Write a `CGImage` as PNG to `url`.
+    ///
+    /// Refuses to write through a symlink or into a symlinked directory, and
+    /// refuses to overwrite an existing directory, so captures can't clobber
+    /// files outside the intended output tree.
     public static func writePNG(_ image: CGImage, to url: URL) throws {
+        try validateOutputURL(url)
+
         guard let destination = CGImageDestinationCreateWithURL(url as CFURL, UTType.png.identifier as CFString, 1, nil)
         else {
-            throw ResizerError.writeFailed(url)
+            throw ResizerError.writeFailed(url, "cannot create PNG destination")
         }
         CGImageDestinationAddImage(destination, image, nil)
         guard CGImageDestinationFinalize(destination) else {
-            throw ResizerError.writeFailed(url)
+            throw ResizerError.writeFailed(url, "image encoding failed")
         }
     }
 
@@ -90,6 +107,29 @@ public enum Resizer {
         let resized = resize(flattened, to: target.size)
         try writePNG(resized, to: output)
         return output
+    }
+
+    /// Reject output paths that are directories, symlinks, or nested under a
+    /// symlinked directory (symlink-follow write protection).
+    static func validateOutputURL(_ url: URL) throws {
+        let fm = FileManager.default
+        var isDirectory: ObjCBool = false
+        if fm.fileExists(atPath: url.path, isDirectory: &isDirectory) {
+            if isDirectory.boolValue {
+                throw ResizerError.writeFailed(url, "path is a directory, expected an image file")
+            }
+            if (try? fm.destinationOfSymbolicLink(atPath: url.path)) != nil {
+                throw ResizerError.writeFailed(url, "refusing to overwrite a symlink")
+            }
+        }
+
+        let parent = url.deletingLastPathComponent()
+        if let resolved = try? fm.destinationOfSymbolicLink(atPath: parent.path) {
+            throw ResizerError.writeFailed(url, "refusing to write through symlinked directory \(resolved)")
+        }
+        guard fm.fileExists(atPath: parent.path, isDirectory: &isDirectory), isDirectory.boolValue else {
+            throw ResizerError.writeFailed(url, "output directory does not exist: \(parent.path)")
+        }
     }
 
     private static func rgbContext(size: CGSize) -> CGContext? {

@@ -128,8 +128,7 @@ public struct ShootRunner {
     }
 
     func deviceDirName(token: String, simulator: Simulator) -> String {
-        let isUDID = token.range(of: #"^[0-9A-Fa-f]{8}-[0-9A-Fa-f-]{27}$"#, options: .regularExpression) != nil
-        if isUDID {
+        if Simulator.isUDID(token) {
             return simulator.slug
         }
         let normalized = token.lowercased()

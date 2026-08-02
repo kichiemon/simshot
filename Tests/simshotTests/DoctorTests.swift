@@ -68,4 +68,53 @@ final class DoctorTests: XCTestCase {
         let results = Doctor.evaluate(facts)
         XCTAssertEqual(results.first(where: { $0.name == "simctl" })?.status, .fail)
     }
+
+    func testAlwaysReturnsAllFiveChecks() {
+        let facts = DoctorFacts(
+            xcodeSelectPath: nil,
+            xcodeVersion: nil,
+            simctlAvailable: false,
+            iosRuntimeCount: 0,
+            availableDeviceCount: 0
+        )
+        let results = Doctor.evaluate(facts)
+        XCTAssertEqual(results.count, 5)
+        XCTAssertEqual(
+            Set(results.map { $0.name }),
+            ["xcode-select", "Xcode", "simctl", "iOS runtimes", "Available simulators"]
+        )
+    }
+
+    func testFailureMessagesAreActionable() {
+        let facts = DoctorFacts(
+            xcodeSelectPath: nil,
+            xcodeVersion: nil,
+            simctlAvailable: false,
+            iosRuntimeCount: 0,
+            availableDeviceCount: 0
+        )
+        for result in Doctor.evaluate(facts) {
+            XCTAssertFalse(result.message.isEmpty, "\(result.name) message should not be empty")
+            if result.status == .fail {
+                XCTAssertTrue(
+                    result.message.lowercased().contains("`") || result.message.lowercased().contains("xcode"),
+                    "\(result.name) failure message should hint at a fix: \(result.message)"
+                )
+            }
+        }
+    }
+
+    func testXcodeOnlyCheckFailsIndependently() {
+        let facts = DoctorFacts(
+            xcodeSelectPath: "/Applications/Xcode.app/Contents/Developer",
+            xcodeVersion: nil,
+            simctlAvailable: true,
+            iosRuntimeCount: 2,
+            availableDeviceCount: 3
+        )
+        let results = Doctor.evaluate(facts)
+        XCTAssertEqual(results.first(where: { $0.name == "xcode-select" })?.status, .ok)
+        XCTAssertEqual(results.first(where: { $0.name == "Xcode" })?.status, .fail)
+        XCTAssertEqual(results.first(where: { $0.name == "simctl" })?.status, .ok)
+    }
 }

@@ -3,6 +3,7 @@
 const fs = require("fs");
 const os = require("os");
 const path = require("path");
+const crypto = require("crypto");
 const { execFileSync } = require("child_process");
 const https = require("https");
 
@@ -49,6 +50,10 @@ function download(url) {
   });
 }
 
+function sha256(buffer) {
+  return crypto.createHash("sha256").update(buffer).digest("hex");
+}
+
 async function main() {
   if (process.platform !== "darwin") {
     fail(
@@ -65,31 +70,79 @@ async function main() {
   const binDir = path.join(__dirname, "bin");
   const binPath = path.join(binDir, BIN_NAME);
   const tarballUrl = `https://github.com/${REPO}/releases/download/${VERSION}/simshot-macos-${arch}.tar.gz`;
+  const checksumUrl = `${tarballUrl}.sha256`;
 
   if (fs.existsSync(binPath)) {
     console.log(`[simshot] binary already present at ${binPath}`);
     return;
   }
 
+  // Unique, 0700 temp dir: no predictable paths, so another user cannot plant
+  // a symlink or a file that we would follow or overwrite.
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "simshot-install-"));
+  const tmpTarball = path.join(tmpDir, `${BIN_NAME}.tar.gz`);
   try {
-    const tmp = path.join(os.tmpdir(), `simshot-${VERSION}-${arch}.tar.gz`);
-    const tarball = await download(tarballUrl);
-    fs.writeFileSync(tmp, tarball);
+    const [tarball, checksumText] = await Promise.all([
+      download(tarballUrl),
+      download(checksumUrl),
+    ]);
+
+    const expected = checksumText
+      .toString("utf8")
+      .trim()
+      .split(/\s+/)[0]
+      .toLowerCase();
+    if (!/^[0-9a-f]{64}$/.test(expected)) {
+      fail(
+        `invalid sha256 checksum file at ${checksumUrl}:\n${checksumText}. ` +
+          "Refusing to install from an unverifiable release."
+      );
+    }
+    const actual = sha256(tarball);
+    if (actual !== expected) {
+      fail(
+        `sha256 checksum mismatch for ${tarballUrl}:\n  expected ${expected}\n  actual   ${actual}. ` +
+          "Refusing to install a tampered or corrupted binary."
+      );
+    }
+    console.log(`[simshot] verified sha256 ${expected}`);
+
+    fs.writeFileSync(tmpTarball, tarball);
+
+    // Inspect the tarball before extracting: only the expected binary, and no
+    // absolute or `..` paths that could escape the install directory.
+    const listing = execFileSync("tar", ["-tzf", tmpTarball], {
+      encoding: "utf8",
+    })
+      .split(/\r?\n/)
+      .filter((line) => line.length > 0);
+    for (const entry of listing) {
+      if (entry !== BIN_NAME) {
+        fail(
+          `tarball contains unexpected entry "${entry}". Refusing to extract.`
+        );
+      }
+    }
 
     fs.mkdirSync(binDir, { recursive: true });
-    execFileSync("tar", ["-xzf", tmp, "-C", binDir], { stdio: "inherit" });
-    fs.rmSync(tmp, { force: true });
+    execFileSync("tar", ["-xzf", tmpTarball, "-C", binDir], {
+      stdio: "inherit",
+    });
 
     if (!fs.existsSync(binPath)) {
       fail(`tarball did not contain expected binary at ${binPath}`);
     }
     fs.chmodSync(binPath, 0o755);
-    console.log(`[simshot] installed ${BIN_NAME} ${VERSION} (${arch}) at ${binPath}`);
+    console.log(
+      `[simshot] installed ${BIN_NAME} ${VERSION} (${arch}) at ${binPath}`
+    );
   } catch (err) {
     fail(
       `failed to download ${tarballUrl}: ${err.message}. ` +
         "Check the release exists, or install via `brew install simshot` / build from source."
     );
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
   }
 }
 

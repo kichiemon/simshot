@@ -1,6 +1,6 @@
 import Foundation
 
-/// App Store screenshot size targets and aspect-ratio matching.
+/// A single App Store screenshot size target (device + name + dimensions).
 public struct AppStoreTarget: Equatable {
     public let size: CGSize
     public let name: String

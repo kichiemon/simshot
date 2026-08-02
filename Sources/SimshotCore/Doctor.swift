@@ -1,11 +1,13 @@
 import Foundation
 
+/// Severity of a `simshot doctor` check result.
 public enum DoctorStatus: Equatable {
     case ok
     case warn
     case fail
 }
 
+/// One `simshot doctor` check result (name, severity, human message).
 public struct DoctorCheckResult: Equatable {
     public let name: String
     public let status: DoctorStatus

@@ -44,6 +44,7 @@ public enum ScreenshotProtocol {
     }
 }
 
+/// One screenshot to capture: which scene, plus per-shot capture options.
 public struct Shot: Codable, Equatable {
     public let name: String
     public let scene: String
@@ -102,6 +103,7 @@ public struct ShotsFile: Codable, Equatable {
     }
 }
 
+/// Language code → locale mapping for `-AppleLocale`.
 public enum LocaleMap {
     /// Map a language code to a locale. Unknown codes are passed through as-is.
     public static func locale(for language: String) -> String {
