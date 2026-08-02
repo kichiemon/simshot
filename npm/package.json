@@ -1,0 +1,37 @@
+{
+  "name": "simshot",
+  "version": "0.1.0",
+  "description": "App Store screenshot capture CLI (simctl only, no XCUITest)",
+  "bin": {
+    "simshot": "cli.js"
+  },
+  "os": [
+    "darwin"
+  ],
+  "cpu": [
+    "arm64",
+    "x64"
+  ],
+  "scripts": {
+    "postinstall": "node install.js"
+  },
+  "files": [
+    "cli.js",
+    "install.js"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kichiemon/simshot.git"
+  },
+  "keywords": [
+    "appstore",
+    "screenshot",
+    "simulator",
+    "simctl",
+    "cli"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=14"
+  }
+}

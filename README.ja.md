@@ -74,7 +74,16 @@ brew tap kichiemon/homebrew-tap
 brew install simshot
 ```
 
-Formula のひな型は [README.md](README.md#homebrew-tap-recommended) を参照してください。
+リリース済みバイナリをインストールする Formula は [`kichiemon/homebrew-tap`](https://github.com/kichiemon/homebrew-tap)（`Formula/simshot.rb`）にあります。
+
+### npm（npmjs.com）
+
+```bash
+npm i -g simshot
+npx simshot shoot
+```
+
+macOS（arm64 / x64）+ Node.js 14+ が必要です。`postinstall` で GitHub Releases から対応アーキテクチャのプリビルドバイナリをダウンロードします（実装は [`npm/`](npm/)）。npm 版は publish 準備のみで、npm アカウントログインが必要なため未公開です。公開までは Homebrew またはソースからのビルドを利用してください。
 
 ## クイックスタート
 

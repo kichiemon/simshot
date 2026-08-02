@@ -13,5 +13,8 @@ appstore/
 screenshots/
 output/
 
+# npm package downloaded binaries
+npm/bin/
+
 # macOS
 .DS_Store

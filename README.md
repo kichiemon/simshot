@@ -69,31 +69,38 @@ ln -s "$(pwd)/.build/release/simshot" /usr/local/bin/simshot
 
 ### Homebrew (tap, recommended)
 
-simshot ships a tap formula. First time:
+simshot ships a tap formula that installs the prebuilt release binary. First time:
 
 ```bash
 brew tap kichiemon/homebrew-tap
 brew install simshot
 ```
 
-> The formula is a standard SwiftPM tap:
+> Formula source: [`kichiemon/homebrew-tap`](https://github.com/kichiemon/homebrew-tap) (`Formula/simshot.rb`):
 
 ```ruby
 class Simshot < Formula
   desc "App Store screenshot capture CLI (simctl only, no XCUITest)"
   homepage "https://github.com/kichiemon/simshot"
-  url "https://github.com/kichiemon/simshot/archive/refs/tags/v0.1.0.tar.gz"
-  sha256 "REPLACE_WITH_RELEASE_SHA256"
+  url "https://github.com/kichiemon/simshot/releases/download/v0.1.0/simshot-macos-arm64.tar.gz"
+  sha256 "a6e920b1445be3e93b436816773b5bda55f545f4b3a9530d0609d9961da3ce32"
   license "MIT"
-
-  depends_on :xcode => "14.0"
+  version "0.1.0"
 
   def install
-    system "swift", "build", "-c", "release", "--disable-sandbox"
-    bin.install ".build/release/simshot"
+    bin.install "simshot"
   end
 end
 ```
+
+### npm (npmjs.com)
+
+```bash
+npm i -g simshot
+npx simshot shoot
+```
+
+Requires Node.js 14+ on macOS (arm64/x64). The package downloads the matching prebuilt binary from GitHub Releases in `postinstall` (see [`npm/`](npm/)). The npm package is prepared but not yet published (publishing requires an npm account) — until then use Homebrew or build from source.
 
 ## Quick start
 

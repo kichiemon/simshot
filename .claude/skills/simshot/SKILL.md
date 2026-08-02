@@ -35,6 +35,15 @@ brew tap kichiemon/homebrew-tap
 brew install simshot
 ```
 
+### npm（npmjs.com）
+
+```bash
+npm i -g simshot
+npx simshot shoot
+```
+
+macOS（arm64 / x64）+ Node.js 14+ が必要。`postinstall` で GitHub Releases からプリビルドバイナリを取得します（実装は `npm/`）。npm 版は publish 準備のみで未公開です。
+
 ### ソースからビルド
 
 ```bash

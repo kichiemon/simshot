@@ -45,7 +45,8 @@ plus `-AppleLanguages (lang)` and `-AppleLocale <locale>`. The app must interpre
 
 - npx (agent skill): `npx skills add kichiemon/simshot` — skill-aware agents then use simshot automatically (skill at `skills/simshot/SKILL.md`)
 - Build from source: `swift build -c release` (binary at `.build/release/simshot`)
-- Homebrew: `brew tap kichiemon/homebrew-tap && brew install simshot`
+- Homebrew: `brew tap kichiemon/homebrew-tap && brew install simshot` (prebuilt binary via tap formula)
+- npm (prepared, not yet published): `npm i -g simshot` / `npx simshot shoot` — downloads a prebuilt binary in `postinstall` (see `npm/`; macOS arm64/x64, Node 14+)
 
 ## Build & test
 

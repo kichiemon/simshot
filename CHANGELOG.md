@@ -9,7 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Nothing yet.
+- Homebrew tap formula at [`kichiemon/homebrew-tap`](https://github.com/kichiemon/homebrew-tap)
+  (`Formula/simshot.rb`) installing the prebuilt `v0.1.0` binary.
+- npm distribution package (`npm/`): `package.json`, `install.js` (downloads the
+  matching macOS arm64/x64 binary from GitHub Releases in `postinstall`) and a
+  `cli.js` bin wrapper. Prepared for `npm i -g simshot` / `npx simshot shoot`;
+  publishing requires an npm account and is not done yet.
 
 ## [0.1.0] - 2026-08-02
 
