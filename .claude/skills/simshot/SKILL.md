@@ -28,6 +28,34 @@ npx skills add kichiemon/simshot
 
 Skill-aware agents (Claude Code, opencode, etc.) then pick it up automatically. After installing, just ask for "App Store screenshots" and the agent will assemble and run `simshot shoot`.
 
+### Single binary (curl, macOS)
+
+```bash
+# Apple Silicon (arm64)
+curl -sL https://github.com/kichiemon/simshot/releases/download/v0.1.1/simshot-macos-arm64 -o /usr/local/bin/simshot && chmod +x /usr/local/bin/simshot
+
+# Intel (x86_64)
+curl -sL https://github.com/kichiemon/simshot/releases/download/v0.1.1/simshot-macos-x86_64 -o /usr/local/bin/simshot && chmod +x /usr/local/bin/simshot
+```
+
+### Nix
+
+```bash
+nix run github:kichiemon/simshot                # run without installing
+nix profile install github:kichiemon/simshot    # install into your profile
+```
+
+The repo's `flake.nix` fetches the prebuilt single binary from GitHub Releases (no source build).
+
+### mise (ubi)
+
+```bash
+mise use -g ubi:kichiemon/simshot   # install into your global config
+simshot --version
+```
+
+mise resolves the `simshot-macos-{os}-{arch}` release assets via its ubi backend.
+
 ### Homebrew (tap)
 
 ```bash
@@ -42,7 +70,7 @@ npm i -g simshot
 npx simshot shoot
 ```
 
-Requires macOS (arm64 / x64) + Node.js 14+. The `postinstall` script downloads a prebuilt binary from GitHub Releases (implementation in `npm/`). The npm package is prepared but not yet published.
+Requires macOS (arm64 / x86_64) + Node.js 14+. The `postinstall` script downloads a prebuilt single binary from GitHub Releases (implementation in `npm/`) and verifies its sha256. The npm package is prepared but not yet published.
 
 ### Build from source
 

@@ -43,10 +43,13 @@ plus `-AppleLanguages (lang)` and `-AppleLocale <locale>`. The app must interpre
 
 ## Install
 
+- Single binary (macOS arm64/x86_64): `curl -sL https://github.com/kichiemon/simshot/releases/download/v0.1.1/simshot-macos-<arm64|x86_64> -o /usr/local/bin/simshot && chmod +x /usr/local/bin/simshot`
+- Nix: `nix run github:kichiemon/simshot` / `nix profile install github:kichiemon/simshot` (the repo's `flake.nix` fetches the prebuilt binary from GitHub Releases)
+- mise (ubi): `mise use -g ubi:kichiemon/simshot` — resolves `simshot-macos-{os}-{arch}` release assets
 - npx (agent skill): `npx skills add kichiemon/simshot` — skill-aware agents then use simshot automatically (skill at `skills/simshot/SKILL.md`); for OpenAI Codex use `npx skills add kichiemon/simshot -a codex` (installs to `.agents/skills/`; the skill is synced across `skills/`, `.claude/skills/`, `.agents/skills/`)
 - Build from source: `swift build -c release` (binary at `.build/release/simshot`)
 - Homebrew: `brew tap kichiemon/homebrew-tap && brew install simshot` (prebuilt binary via tap formula)
-- npm (prepared, not yet published): `npm i -g simshot` / `npx simshot shoot` — downloads a prebuilt binary in `postinstall` (see `npm/`; macOS arm64/x64, Node 14+)
+- npm (prepared, not yet published): `npm i -g simshot` / `npx simshot shoot` — downloads a prebuilt single binary (arm64/x86_64) with sha256 verification in `postinstall` (see `npm/`; macOS, Node 14+)
 
 ## Build & test
 
