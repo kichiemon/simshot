@@ -7,8 +7,11 @@ simshot — App Store screenshot capture CLI (simctl only, no XCUITest).
 ```bash
 swift build                # build the CLI (product: simshot)
 swift test                 # run the test suite
+swift-format lint --recursive Sources Tests   # code style check
 swift run simshot shoot --help   # CLI help
 swift run simshot devices    # list available simulators
+swift run simshot doctor     # diagnose the local Xcode/simulator environment
+swift run simshot init --yes # generate a simshot.yml scaffold
 ```
 
 ## Project layout
@@ -20,11 +23,15 @@ swift run simshot devices    # list available simulators
   - `ShotSpec.swift` — screenshot scene launch-argument protocol + shot config decoding.
   - `DeviceSpec.swift` — App Store size targets and aspect-ratio matching.
   - `Resizer.swift` — alpha flattening + resize via CoreGraphics/ImageIO (no PIL).
+  - `Doctor.swift` — environment diagnostics (`simshot doctor`); pure `evaluate` for tests.
+  - `InitConfig.swift` — `simshot init` answer model + commented `simshot.yml` template.
   - `Support.swift` — `SimshotError`, `Log`, version.
-- `Sources/simshot/` — CLI entry point (`CLI.swift`), argument parsing (`Options.swift`), the shoot orchestrator (`ShootRunner.swift`), help text (`Help.swift`).
+- `Sources/simshot/` — CLI entry point (`CLI.swift`), argument parsing (`Options.swift`), the shoot orchestrator (`ShootRunner.swift`), doctor/init runners (`Doctor.swift`, `InitRunner.swift`), help text (`Help.swift`).
 - `Tests/simshotTests/` — XCTest suite.
-- `examples/shots.json` — sample shot config.
-- `.github/workflows/` — CI (`ci.yml`) and release (`release.yml`) pipelines.
+- `examples/` — sample shot config (`shots.json`), dummy app protocol handler (`DemoSceneHandler.swift`), and an `examples/README.md` explaining it.
+- `.github/workflows/` — CI (`ci.yml`, includes swift-format lint) and release (`release.yml`) pipelines.
+- `.github/demo.tape` — vhs recording that renders `assets/demo.gif` for the READMEs.
+- `.swift-format` / `.swift-version` — code style config (4-space, 120 col) and Swift version.
 - `llms.txt` — LLM-facing project summary; keep in sync with the READMEs.
 
 ## Conventions
@@ -40,5 +47,5 @@ swift run simshot devices    # list available simulators
 Before committing, run:
 
 ```bash
-swift build && swift test
+swift-format lint --recursive Sources Tests && swift build && swift test
 ```

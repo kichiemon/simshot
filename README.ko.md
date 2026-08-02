@@ -2,7 +2,14 @@
 
 **[English](README.md) · [日本語](README.ja.md) · [한국어](README.ko.md)**
 
+![CI](https://img.shields.io/github/actions/workflow/status/kichiemon/simshot/ci.yml?style=flat-square&label=CI)
+![Swift](https://img.shields.io/badge/Swift-5.9%2B-F05138?style=flat-square&logo=swift&logoColor=white)
+![License](https://img.shields.io/github/license/kichiemon/simshot?style=flat-square&color=blue)
+![Stars](https://img.shields.io/github/stars/kichiemon/simshot?style=social)
+
 iOS 시뮬레이터에서 **`simctl`만으로** App Store 제출용 스크린샷을 자동 촬영하는 CLI입니다. **XCUITest 불필요** · 테스트 러너 기인 행(hang) 없음.
+
+![simshot demo](assets/demo.gif)
 
 앱 쪽은 `#if DEBUG`로 기동 인자 프로토콜을 해석하는 작은 핸들러를 구현하기만 하면 됩니다. 이후 simshot이 「빌드 → 시뮬레이터 부팅 → 상태 바 덮어쓰기 → 각 씬으로 launch → 촬영 → App Store 크기로 리사이즈」까지 한 번에 처리합니다.
 
@@ -13,13 +20,20 @@ simshot shoot --project Kanapp.xcodeproj --scheme Kanapp \
   --langs ja,en --shots shots.json --resize
 ```
 
-## 왜 fastlane snapshot이 아닌가
+## 왜 simshot인가
 
-`fastlane snapshot`은 **XCUITest**로 UI를 조작하므로, 테스트 타깃 유지·깨지기 쉬운 요소 쿼리·러너 크래시와 싸워야 합니다. simshot은 모델을 뒤집었습니다.
+`fastlane snapshot`은 **XCUITest**로 UI를 조작하므로, 테스트 타깃 유지·깨지기 쉬운 요소 쿼리·러너 크래시와 싸워야 합니다. simshot은 모델을 뒤집었습니다. **앱 자신**이 각 씬으로 이동하고(공개된 기동 인자 프로토콜 해석), simshot은 모든 단계에 하드 타임아웃이 걸린 `simctl`만 호출합니다.
 
-- **앱 자신**이 각 씬으로 이동합니다 (공개된 기동 인자 프로토콜을 해석).
-- simshot은 `simctl`(`bootstatus` / `status_bar` / `launch` / `io screenshot`)만 호출합니다. 모든 단계에 하드 타임아웃이 걸려 있어 절대 행하지 않습니다.
-- 테스트 번들도 `XCUITest`도 필요 없습니다. `#if DEBUG` 핸들러와 설정 파일뿐입니다.
+| | simshot | fastlane snapshot |
+|---|---|---|
+| UI 자동 조작 | **불필요** — `simctl`만 | XCUITest 러너 |
+| 행(hang) | **모든 명령에 하드 타임아웃** | CI를 멈출 수 있음 |
+| Ruby | **불필요** | Ruby + fastlane + gem |
+| 테스트 타깃 | 앱 내 `#if DEBUG` 핸들러 | 전용 UI 테스트 타깃 |
+| 상태 바 덮어쓰기 | **내장** | 플러그인 |
+| App Store 크기 리사이즈 | **내장**(`--resize`) | 별도 도구 |
+| 다국어 | `--langs ja,en` | 로케일별 설정 |
+| 의존성 | **0개** | gem 다수 |
 
 ## 동작 원리
 
@@ -65,10 +79,11 @@ Formula 양식은 [README.md](README.md#homebrew-tap-recommended)를 참조하�
 ## 퀵스타트
 
 1. 앱에 [씬 기동 인자 핸들러](#screenshot-scene-protocol)를 추가(5분).
-2. 한 번 빌드 후 시뮬레이터 확인:
+2. 환경 확인과 시뮬레이터 목록:
 
    ```bash
-   simshot devices
+   simshot doctor     # xcode-select / Xcode / simctl / 런타임 진단
+   simshot devices    # 사용 가능한 시뮬레이터 목록
    ```
 
 3. `shots.json`을 작성([`examples/shots.json`](examples/shots.json) 참조)하거나 `--scenes` 사용:
@@ -89,8 +104,33 @@ Formula 양식은 [README.md](README.md#homebrew-tap-recommended)를 참조하�
 |---|---|
 | `simshot shoot <options>` | 빌드·부팅·촬영·리사이즈 일괄 실행 |
 | `simshot devices` | 사용 가능한 시뮬레이터 목록(이름 + UDID) |
+| `simshot doctor` | 로컬 Xcode / 시뮬레이터 환경 진단(문제 시 exit 1) |
+| `simshot init` | 주석 포함 `simshot.yml` 스캐폴드 생성 |
 | `simshot version` | 버전 표시 |
 | `simshot help` | 도움말 표시 |
+
+### `simshot doctor`
+
+`xcode-select` / Xcode / `simctl` / iOS 런타임 / 사용 가능한 시뮬레이터를 검사하고, 이상이 있으면 exit `1`을 반환합니다. 새 머신 셋업이나 버그 리포트 전에 실행하세요.
+
+```text
+$ simshot doctor
+✅ xcode-select: /Applications/Xcode.app/Contents/Developer
+✅ Xcode: Xcode 26.5
+✅ simctl: found
+✅ iOS runtimes: 7 installed
+✅ Available simulators: 36 available
+
+✅ All checks passed.
+```
+
+### `simshot init`
+
+`simshot shoot`에 넘길 옵션을 문서화한 주석 포함 `simshot.yml` 스캐폴드를 생성합니다. 기본은 대화식, `--yes`로 플레이스홀더 값 그대로 작성합니다.
+
+```bash
+simshot init --yes   # → simshot.yml(주석 포함 템플릿)
+```
 
 ## `simshot shoot` 옵션
 
@@ -281,6 +321,7 @@ appstore/
 ```bash
 swift build   # 빌드
 swift test    # 테스트 실행
+swift-format lint --recursive Sources Tests   # 코드 스타일
 swift run simshot shoot --help
 ```
 

@@ -1,0 +1,46 @@
+name: Bug report
+description: Report a bug in simshot
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting! Please run `simshot doctor` first (if it works) and
+        paste its output — it makes diagnosis much faster.
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What happened, and what did you expect to happen?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction steps
+      description: The exact command(s) you ran and the config you used.
+      placeholder: |
+        simshot shoot --project ... --scheme ... --bundle-id ... --devices ... --shots shots.json
+    validations:
+      required: true
+  - type: textarea
+    id: output
+    attributes:
+      label: Output / logs
+      description: Paste the relevant error output (or run with `--verbose`).
+      render: shell
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Paste the output of `simshot doctor` if available.
+      render: shell
+    validations:
+      required: true
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Checklist
+      options:
+        - label: I searched for an existing issue before filing this one.
+          required: true

@@ -36,8 +36,9 @@ public struct Simulator: Equatable {
             throw SimshotError.commandFailed("`simctl list devices` failed:\n\(result.stderr)")
         }
         guard let data = result.stdout.data(using: .utf8),
-              let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-              let devices = json["devices"] as? [String: Any] else {
+            let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+            let devices = json["devices"] as? [String: Any]
+        else {
             throw SimshotError.invalid("Could not parse `simctl list devices -j` output.")
         }
 
@@ -46,9 +47,11 @@ public struct Simulator: Equatable {
             guard let list = entries as? [[String: Any]] else { continue }
             for item in list {
                 guard let name = item["name"] as? String,
-                      let udid = item["udid"] as? String,
-                      (item["isAvailable"] as? Bool) ?? true else { continue }
-                found.append(Simulator(name: name, udid: udid, runtimeComponents: runtimeComponents(of: runtimeBundleID)))
+                    let udid = item["udid"] as? String,
+                    (item["isAvailable"] as? Bool) ?? true
+                else { continue }
+                found.append(
+                    Simulator(name: name, udid: udid, runtimeComponents: runtimeComponents(of: runtimeBundleID)))
             }
         }
         return found.sorted { $0.name < $1.name }
@@ -85,7 +88,8 @@ public struct Simulator: Equatable {
             return matches[0]
         }
         if matches.isEmpty {
-            throw SimshotError.notFound("No available simulator matching '\(token)'. Run `simshot devices` to list them.")
+            throw SimshotError.notFound(
+                "No available simulator matching '\(token)'. Run `simshot devices` to list them.")
         }
         let names = matches.map { "  \($0.name) (\($0.udid))" }.joined(separator: "\n")
         throw SimshotError.invalid("'\(token)' matched multiple simulators:\n\(names)\nBe more specific.")
@@ -192,7 +196,8 @@ public struct Simulator: Equatable {
             )
             if result.status == 0 { return }
             lastError = result.stderr
-            Log.warn("⚠️  launch attempt \(attempt) failed: \(lastError.trimmingCharacters(in: .whitespacesAndNewlines))")
+            Log.warn(
+                "⚠️  launch attempt \(attempt) failed: \(lastError.trimmingCharacters(in: .whitespacesAndNewlines))")
             if attempt < retries {
                 Thread.sleep(forTimeInterval: 2.0)
             }
@@ -220,7 +225,8 @@ public struct Simulator: Equatable {
             )
             if result.status == 0 { return }
             lastError = result.stderr
-            Log.warn("⚠️  screenshot attempt \(attempt) failed: \(lastError.trimmingCharacters(in: .whitespacesAndNewlines))")
+            Log.warn(
+                "⚠️  screenshot attempt \(attempt) failed: \(lastError.trimmingCharacters(in: .whitespacesAndNewlines))")
             Thread.sleep(forTimeInterval: 1.5)
         }
         throw SimshotError.commandFailed("simctl screenshot failed on \(name):\n\(lastError)")

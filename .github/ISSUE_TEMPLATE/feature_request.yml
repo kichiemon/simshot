@@ -1,0 +1,38 @@
+name: Feature request
+description: Suggest a feature for simshot
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        simshot aims to stay small and dependency-free. Before suggesting a
+        feature, consider whether it fits the project's values (simctl-only,
+        no XCUITest, zero third-party dependencies).
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What problem does this feature solve? Include a concrete workflow.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: How should it work? Include example CLI usage or config.
+      placeholder: |
+        simshot shoot --project ... --scheme ... --bundle-id ... --devices ... --shots shots.json --some-new-flag
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: What else did you try, and why didn't it work?
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Checklist
+      options:
+        - label: I searched for an existing issue before filing this one.
+          required: true

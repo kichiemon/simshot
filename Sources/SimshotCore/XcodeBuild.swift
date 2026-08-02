@@ -40,18 +40,22 @@ public enum XcodeBuild {
     /// Locate the built `.app` bundle inside a DerivedData directory.
     public static func findApp(derivedDataPath: String) -> URL? {
         let products = URL(fileURLWithPath: derivedDataPath).appendingPathComponent("Build/Products")
-        guard let entries = try? FileManager.default.contentsOfDirectory(
-            at: products, includingPropertiesForKeys: nil
-        ) else {
+        guard
+            let entries = try? FileManager.default.contentsOfDirectory(
+                at: products, includingPropertiesForKeys: nil
+            )
+        else {
             return nil
         }
         for entry in entries where entry.pathExtension == "app" {
             return entry
         }
         let debugDir = products.appendingPathComponent("Debug-iphonesimulator")
-        guard let apps = try? FileManager.default.contentsOfDirectory(
-            at: debugDir, includingPropertiesForKeys: nil
-        ) else {
+        guard
+            let apps = try? FileManager.default.contentsOfDirectory(
+                at: debugDir, includingPropertiesForKeys: nil
+            )
+        else {
             return nil
         }
         return apps.first { $0.pathExtension == "app" }

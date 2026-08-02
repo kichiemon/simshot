@@ -122,7 +122,9 @@ public struct ShootRunner {
         try FileManager.default.createDirectory(atPath: outDir, withIntermediateDirectories: true)
         let outputURL = URL(fileURLWithPath: "\(outDir)/\(name)")
         try Resizer.makeAppStoreImage(input: inputURL, output: outputURL, target: target)
-        Log.info("   🖼  \(name): \(image.width)x\(image.height) → \(Int(target.size.width))x\(Int(target.size.height)) [\(target.name)]")
+        Log.info(
+            "   🖼  \(name): \(image.width)x\(image.height) → \(Int(target.size.width))x\(Int(target.size.height)) [\(target.name)]"
+        )
     }
 
     func deviceDirName(token: String, simulator: Simulator) -> String {

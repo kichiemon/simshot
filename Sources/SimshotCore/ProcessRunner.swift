@@ -35,11 +35,15 @@ public enum ProcessRunner {
 
             queue.async(group: group) {
                 let data = stdoutPipe.fileHandleForReading.readDataToEndOfFile()
-                lock.lock(); stdoutData.append(data); lock.unlock()
+                lock.lock()
+                stdoutData.append(data)
+                lock.unlock()
             }
             queue.async(group: group) {
                 let data = stderrPipe.fileHandleForReading.readDataToEndOfFile()
-                lock.lock(); stderrData.append(data); lock.unlock()
+                lock.lock()
+                stderrData.append(data)
+                lock.unlock()
             }
         } else {
             process.standardOutput = FileHandle.nullDevice

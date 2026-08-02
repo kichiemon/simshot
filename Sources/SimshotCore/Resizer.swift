@@ -1,5 +1,5 @@
-import Foundation
 import CoreGraphics
+import Foundation
 import ImageIO
 import UniformTypeIdentifiers
 
@@ -22,7 +22,8 @@ public enum ResizerError: Error, CustomStringConvertible {
 public enum Resizer {
     public static func loadCGImage(at url: URL) throws -> CGImage {
         guard let source = CGImageSourceCreateWithURL(url as CFURL, nil),
-              let image = CGImageSourceCreateImageAtIndex(source, 0, nil) else {
+            let image = CGImageSourceCreateImageAtIndex(source, 0, nil)
+        else {
             throw ResizerError.loadFailed(url)
         }
         return image
@@ -58,7 +59,8 @@ public enum Resizer {
         backgroundColor: (CGFloat, CGFloat, CGFloat) = (1, 1, 1)
     ) -> CGImage {
         guard let context = rgbContext(size: size) else { return image }
-        context.setFillColor(CGColor(srgbRed: backgroundColor.0, green: backgroundColor.1, blue: backgroundColor.2, alpha: 1))
+        context.setFillColor(
+            CGColor(srgbRed: backgroundColor.0, green: backgroundColor.1, blue: backgroundColor.2, alpha: 1))
         context.fill(CGRect(origin: .zero, size: size))
         context.interpolationQuality = .high
         context.draw(image, in: CGRect(origin: .zero, size: size))
@@ -66,7 +68,8 @@ public enum Resizer {
     }
 
     public static func writePNG(_ image: CGImage, to url: URL) throws {
-        guard let destination = CGImageDestinationCreateWithURL(url as CFURL, UTType.png.identifier as CFString, 1, nil) else {
+        guard let destination = CGImageDestinationCreateWithURL(url as CFURL, UTType.png.identifier as CFString, 1, nil)
+        else {
             throw ResizerError.writeFailed(url)
         }
         CGImageDestinationAddImage(destination, image, nil)

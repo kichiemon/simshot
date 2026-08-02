@@ -2,7 +2,14 @@
 
 **[English](README.md) · [日本語](README.ja.md) · [한국어](README.ko.md)**
 
+![CI](https://img.shields.io/github/actions/workflow/status/kichiemon/simshot/ci.yml?style=flat-square&label=CI)
+![Swift](https://img.shields.io/badge/Swift-5.9%2B-F05138?style=flat-square&logo=swift&logoColor=white)
+![License](https://img.shields.io/github/license/kichiemon/simshot?style=flat-square&color=blue)
+![Stars](https://img.shields.io/github/stars/kichiemon/simshot?style=social)
+
 Capture App Store-ready screenshots from the iOS Simulator with **`simctl` only — no XCUITest, no flaky test runners, no hangs.**
+
+![simshot demo](assets/demo.gif)
 
 Your app implements a tiny `#if DEBUG` launch-argument handler; simshot does the rest: build, boot simulators, override the status bar, launch each scene, capture, and resize to App Store sizes.
 
@@ -13,13 +20,20 @@ simshot shoot --project Kanapp.xcodeproj --scheme Kanapp \
   --langs ja,en --shots shots.json --resize
 ```
 
-## Why not fastlane snapshot?
+## Why simshot?
 
-`fastlane snapshot` drives the UI through **XCUITest**, which means maintaining test targets, fighting flaky element queries, and dealing with runner crashes. simshot inverts the model:
+`fastlane snapshot` drives the UI through **XCUITest**, which means maintaining test targets, fighting flaky element queries, and dealing with runner crashes. simshot inverts the model: the **app itself** navigates to each scene (reading a documented launch-argument protocol), and simshot just drives `simctl` with a hard timeout on every step.
 
-- The **app itself** navigates to each scene (reading a documented launch-argument protocol).
-- simshot just calls `simctl` (`bootstatus`, `status_bar`, `launch`, `io screenshot`) with a hard timeout on every step, so it never hangs.
-- No test bundle, no `XCUITest` — just a `#if DEBUG` handler and a config file.
+| | simshot | fastlane snapshot |
+|---|---|---|
+| UI automation | **None** — `simctl` only | XCUITest runner |
+| Hangs | **Hard timeout on every command** | Can hang CI |
+| Ruby | **No** | Ruby + fastlane + gems |
+| Test target | `#if DEBUG` handler in your app | Dedicated UI test target |
+| Status bar override | **Built in** | Plugin |
+| Resize to App Store sizes | **Built in** (`--resize`) | Separate tooling |
+| Multi-language | `--langs ja,en` | Per-locale setup |
+| Dependency footprint | **Zero** | Dozens of gems |
 
 ## How it works
 
@@ -84,10 +98,11 @@ end
 ## Quick start
 
 1. Add the [scene protocol handler](#screenshot-scene-protocol) to your app (5 minutes).
-2. Build once and list simulators:
+2. Verify the environment and list simulators:
 
    ```bash
-   simshot devices
+   simshot doctor     # diagnose xcode-select / Xcode / simctl / runtimes
+   simshot devices    # list available simulators
    ```
 
 3. Create a `shots.json` (see [`examples/shots.json`](examples/shots.json)) or use `--scenes`:
@@ -108,8 +123,33 @@ Screenshots land in `appstore/<device>/<lang>/NN_name.png`.
 |---|---|
 | `simshot shoot <options>` | Build, boot, capture, and resize screenshots. |
 | `simshot devices` | List available simulators (name + UDID). |
+| `simshot doctor` | Diagnose the local Xcode / simulator environment (exit 1 on problems). |
+| `simshot init` | Generate a commented `simshot.yml` config scaffold. |
 | `simshot version` | Print the version. |
 | `simshot help` | Show help. |
+
+### `simshot doctor`
+
+Checks `xcode-select`, Xcode, `simctl`, iOS runtimes, and available simulators, and exits `1` if anything is broken. Run it when setting up a new machine or before filing a bug.
+
+```text
+$ simshot doctor
+✅ xcode-select: /Applications/Xcode.app/Contents/Developer
+✅ Xcode: Xcode 26.5
+✅ simctl: found
+✅ iOS runtimes: 7 installed
+✅ Available simulators: 36 available
+
+✅ All checks passed.
+```
+
+### `simshot init`
+
+Generates a commented `simshot.yml` scaffold that documents the options you'd pass to `simshot shoot`. Interactive by default; `--yes` writes it with placeholder values.
+
+```bash
+simshot init --yes   # → simshot.yml (commented template)
+```
 
 ## `simshot shoot` reference
 
@@ -300,6 +340,7 @@ appstore/
 ```bash
 swift build   # build
 swift test    # run tests
+swift-format lint --recursive Sources Tests   # code style
 swift run simshot shoot --help
 ```
 
