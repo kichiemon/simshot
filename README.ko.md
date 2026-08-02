@@ -88,14 +88,16 @@ nix run github:kichiemon/simshot          # 설치 없이 실행
 nix profile install github:kichiemon/simshot   # 프로필에 설치
 ```
 
-### mise (ubi)
+### mise
 
-[mise](https://mise.jdx.dev/)는 [ubi](https://github.com/houseabsolute/ubi) 백엔드를 통해 `simshot-macos-{os}-{arch}` 릴리스 에셋을 해석하여 simshot을 설치할 수 있습니다:
+[mise](https://mise.jdx.dev/)는 GitHub Releases 에셋에서 simshot을 설치할 수 있습니다. **github backend**가 권장됩니다(SLSA 출처·artifact attestation도 검증):
 
 ```bash
-mise use -g ubi:kichiemon/simshot   # 전역 설정에 설치
-simshot --version                   # v0.1.1
+mise use -g github:kichiemon/simshot   # 전역 설정에 설치
+simshot --version                      # v0.1.1
 ```
+
+기존 `ubi` backend(`mise use ubi:kichiemon/simshot`)도 같은 `simshot-macos-{os}-{arch}` 에셋을 해석하여 동작하지만, mise에서 deprecated이며 mise 2027.1.0에서 제거될 예정입니다.
 
 ### Homebrew (tap)
 

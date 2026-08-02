@@ -96,14 +96,16 @@ nix run github:kichiemon/simshot          # run without installing
 nix profile install github:kichiemon/simshot   # install into your profile
 ```
 
-### mise (ubi)
+### mise
 
-[mise](https://mise.jdx.dev/) installs simshot through its [ubi](https://github.com/houseabsolute/ubi) backend, which resolves the `simshot-macos-{os}-{arch}` release assets:
+[mise](https://mise.jdx.dev/) installs simshot from the GitHub Releases assets. The **github backend** is recommended (it also verifies SLSA provenance / artifact attestations):
 
 ```bash
-mise use -g ubi:kichiemon/simshot   # install into your global config
-simshot --version                   # v0.1.1
+mise use -g github:kichiemon/simshot   # install into your global config
+simshot --version                      # v0.1.1
 ```
+
+The legacy `ubi` backend (`mise use ubi:kichiemon/simshot`) resolves the same `simshot-macos-{os}-{arch}` release assets and also works, but it is deprecated in mise and will be removed in mise 2027.1.0.
 
 ### Homebrew (tap, recommended)
 

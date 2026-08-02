@@ -47,14 +47,14 @@ nix profile install github:kichiemon/simshot    # install into your profile
 
 The repo's `flake.nix` fetches the prebuilt single binary from GitHub Releases (no source build).
 
-### mise (ubi)
+### mise
 
 ```bash
-mise use -g ubi:kichiemon/simshot   # install into your global config
+mise use -g github:kichiemon/simshot   # install into your global config
 simshot --version
 ```
 
-mise resolves the `simshot-macos-{os}-{arch}` release assets via its ubi backend.
+The github backend installs simshot from the GitHub Releases assets (SLSA / attestation verified). The legacy `ubi` backend (`mise use ubi:kichiemon/simshot`) also works but is deprecated in mise 2027.1.0.
 
 ### Homebrew (tap)
 
