@@ -16,20 +16,35 @@ jobs:
       - name: Swift version
         run: swift --version
 
-      - name: Build release binary
-        run: swift build -c release --disable-sandbox
+      - name: Build universal binary (arm64 + x86_64)
+        run: swift build -c release --disable-sandbox --arch arm64 --arch x86_64
 
-      - name: Package binary
+      - name: Package single binaries (arm64 + x86_64 + tar.gz + sha256)
         run: |
+          set -euo pipefail
+          if [ -f .build/apple/Products/Release/simshot ]; then
+            UNIVERSAL=.build/apple/Products/Release/simshot
+          else
+            UNIVERSAL=.build/release/simshot
+          fi
           mkdir -p dist
-          cp .build/release/simshot dist/simshot
-          tar -czf "dist/simshot-macos-$(uname -m).tar.gz" -C dist simshot
-          shasum -a 256 "dist/simshot-macos-$(uname -m).tar.gz" > "dist/simshot-macos-$(uname -m).tar.gz.sha256"
+          cp "$UNIVERSAL" dist/simshot-universal
+          lipo -thin arm64 "$UNIVERSAL" -output dist/simshot-macos-arm64
+          lipo -thin x86_64 "$UNIVERSAL" -output dist/simshot-macos-x86_64
+          for arch in arm64 x86_64; do
+            bin="dist/simshot-macos-${arch}"
+            mkdir -p "dist/pkg-${arch}"
+            cp "$bin" "dist/pkg-${arch}/simshot"
+            tar -czf "dist/simshot-macos-${arch}.tar.gz" -C "dist/pkg-${arch}" simshot
+            shasum -a 256 "$bin" > "dist/simshot-macos-${arch}.sha256"
+            shasum -a 256 "dist/simshot-macos-${arch}.tar.gz" > "dist/simshot-macos-${arch}.tar.gz.sha256"
+          done
+          ls -l dist/
 
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name }}
           name: simshot ${{ github.ref_name }}
-          files: dist/*.tar.gz*
+          files: dist/simshot-macos-*
           generate_release_notes: true
