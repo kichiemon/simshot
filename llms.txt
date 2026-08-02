@@ -43,7 +43,7 @@ plus `-AppleLanguages (lang)` and `-AppleLocale <locale>`. The app must interpre
 
 ## Install
 
-- npx (agent skill): `npx skills add kichiemon/simshot`
+- npx (agent skill): `npx skills add kichiemon/simshot` — skill-aware agents then use simshot automatically (skill at `skills/simshot/SKILL.md`)
 - Build from source: `swift build -c release` (binary at `.build/release/simshot`)
 - Homebrew: `brew tap kichiemon/homebrew-tap && brew install simshot`
 

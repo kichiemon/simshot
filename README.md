@@ -55,7 +55,7 @@ Every external command runs through a **timeout + retry** wrapper, so a crashed 
 npx skills add kichiemon/simshot
 ```
 
-Installs simshot as a reusable agent skill (for Claude Code / opencode and other skill-aware agents).
+Installs simshot as a reusable agent skill (for Claude Code / opencode and other skill-aware agents). Once installed, skill-aware agents can use simshot automatically — just ask it to capture App Store screenshots, and the agent builds and runs `simshot shoot` for you (see [`skills/simshot/SKILL.md`](skills/simshot/SKILL.md)).
 
 ### Build from source
 

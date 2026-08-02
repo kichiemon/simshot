@@ -55,7 +55,7 @@ simshot shoot --project Kanapp.xcodeproj --scheme Kanapp \
 npx skills add kichiemon/simshot
 ```
 
-simshot を再利用可能なエージェントスキルとして導入します（Claude Code / opencode 等のスキル対応エージェント向け）。
+simshot を再利用可能なエージェントスキルとして導入します（Claude Code / opencode 等のスキル対応エージェント向け）。インストール後はエージェントが自動で利用できます。「App Store スクリーンショットを撮影して」と頼むだけで、エージェントが `simshot shoot` を組み立てて実行します（詳細は [`skills/simshot/SKILL.md`](skills/simshot/SKILL.md) 参照）。
 
 ### ソースからビルド
 
