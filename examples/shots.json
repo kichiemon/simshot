@@ -1,0 +1,11 @@
+{
+  "shots": [
+    { "name": "04_home.png", "scene": "home", "wait": 8 },
+    { "name": "01_trace.png", "scene": "trace", "strokes": 1, "wait": 6 },
+    { "name": "02_transform.png", "scene": "trace", "strokes": 2, "wait": 7 },
+    { "name": "05_celebration.png", "scene": "trace", "strokes": 3, "wait": 9 },
+    { "name": "03_notebook.png", "scene": "notebook", "wait": 7 },
+    { "name": "06_store.png", "scene": "store", "wait": 8 },
+    { "name": "07_store_tip.png", "scene": "store", "scrollBottom": true, "wait": 8 }
+  ]
+}

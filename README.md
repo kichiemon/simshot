@@ -1,0 +1,298 @@
+# simcap
+
+Capture App Store-ready screenshots from the iOS Simulator with **`simctl` only — no XCUITest, no flaky test runners, no hangs.**
+
+Your app implements a tiny `#if DEBUG` launch-argument handler; simcap does the rest: build, boot simulators, override the status bar, launch each scene, capture, and resize to App Store sizes.
+
+```bash
+simcap shoot --project Kanapp.xcodeproj --scheme Kanapp \
+  --bundle-id dev.kichiemon.kanapp \
+  --devices iphone-17-pro-max,ipad-pro-13 \
+  --langs ja,en --shots shots.json --resize
+```
+
+## Why not fastlane snapshot?
+
+`fastlane snapshot` drives the UI through **XCUITest**, which means maintaining test targets, fighting flaky element queries, and dealing with runner crashes. simcap inverts the model:
+
+- The **app itself** navigates to each scene (reading a documented launch-argument protocol).
+- simcap just calls `simctl` (`bootstatus`, `status_bar`, `launch`, `io screenshot`) with a hard timeout on every step, so it never hangs.
+- No test bundle, no `XCUITest` — just a `#if DEBUG` handler and a config file.
+
+## How it works
+
+1. `xcodebuild` builds the app for the generic simulator (or use an existing `.app` with `--app-path`).
+2. For each device × language:
+   - `simctl bootstatus <udid> -b` boots (and waits).
+   - `simctl status_bar <udid> override --time "9:41" --batteryState charged --batteryLevel 100 ...` prettifies the status bar.
+   - The app is installed (previous install removed first for a clean state).
+   - For each shot, simcap launches the app with the scene protocol args, waits for the scene to settle, then takes `simctl io <udid> screenshot`.
+3. Raw captures land in `<output>/raw/<device>/<lang>/`, and (with `--resize`) App Store-ready copies — alpha flattened, resized to the matching size — in `<output>/<device>/<lang>/`.
+
+Every external command runs through a **timeout + retry** wrapper, so a crashed app or stuck simulator can never hang CI.
+
+## Install
+
+### Build from source
+
+```bash
+git clone https://github.com/kichiemon/simcap.git
+cd simcap
+swift build -c release
+# binary at .build/release/simcap — symlink or copy it into your PATH
+ln -s "$(pwd)/.build/release/simcap" /usr/local/bin/simcap
+```
+
+### Homebrew (tap, recommended)
+
+simcap ships a tap formula. First time:
+
+```bash
+brew tap kichiemon/homebrew-tap
+brew install simcap
+```
+
+> The formula is a standard SwiftPM tap:
+
+```ruby
+class Simcap < Formula
+  desc "App Store screenshot capture CLI (simctl only, no XCUITest)"
+  homepage "https://github.com/kichiemon/simcap"
+  url "https://github.com/kichiemon/simcap/archive/refs/tags/v0.1.0.tar.gz"
+  sha256 "REPLACE_WITH_RELEASE_SHA256"
+  license "MIT"
+
+  depends_on :xcode => "14.0"
+
+  def install
+    system "swift", "build", "-c", "release", "--disable-sandbox"
+    bin.install ".build/release/simcap"
+  end
+end
+```
+
+## Quick start
+
+1. Add the [scene protocol handler](#screenshot-scene-protocol) to your app (5 minutes).
+2. Build once and list simulators:
+
+   ```bash
+   simcap devices
+   ```
+
+3. Create a `shots.json` (see [`examples/shots.json`](examples/shots.json)) or use `--scenes`:
+
+   ```bash
+   simcap shoot --project MyApp.xcodeproj --scheme MyApp \
+     --bundle-id com.example.myapp \
+     --devices iphone-17-pro-max,ipad-pro-13 \
+     --langs ja,en --scenes home,detail,settings \
+     --output appstore --resize
+   ```
+
+Screenshots land in `appstore/<device>/<lang>/NN_name.png`.
+
+## Commands
+
+| Command | Description |
+|---|---|
+| `simcap shoot <options>` | Build, boot, capture, and resize screenshots. |
+| `simcap devices` | List available simulators (name + UDID). |
+| `simcap version` | Print the version. |
+| `simcap help` | Show help. |
+
+## `simcap shoot` reference
+
+```
+BUILD
+  --project <path.xcodeproj>       Xcode project to build (or --workspace)
+  --workspace <path.xcworkspace>   Xcode workspace to build
+  --scheme <name>                  Scheme to build
+  --app-path <path.app>            Skip building; use an existing .app bundle
+
+REQUIRED
+  --bundle-id <id>                 App bundle identifier
+  --devices <list>                 Simulator names or UDIDs (comma-separated)
+
+SHOTS
+  --shots <config.json>            Shot config file ({ "shots": [...] })
+  --scenes <list>                  Shortcut: one shot per scene, e.g. home,trace
+  --wait <secs>                    Default settle time per shot for --scenes (default: 6)
+
+LOCALIZATION
+  --langs <list>                   Languages (default: en), e.g. ja,en
+  --locales <map>                  lang=locale overrides, e.g. ja=ja_JP,en=en_US
+
+OUTPUT
+  --output <dir>                   Output directory (default: appstore)
+  --resize                         Write App Store-ready copies (alpha removed)
+  --derived-data <dir>             DerivedData path (default: ~/.simcap/DerivedData)
+
+SIMULATOR
+  --timeout <secs>                 Timeout for external commands (default: 300)
+  --status-bar-time <t>            Status bar clock (default: 9:41)
+  --status-bar-battery <n>         Status bar battery % (default: 100)
+  --no-ui-testing                  Do not pass --ui-testing to the app
+  --no-clean                       Do not uninstall before installing
+  --keep-running                   Do not shut down simulators afterwards
+
+MISC
+  --verbose, -v                    Verbose output
+  --help, -h                       Show help
+```
+
+### Devices
+
+`--devices` accepts either device names or UDIDs:
+
+```bash
+simcap shoot ... --devices iphone-17-pro-max,ipad-pro-13
+simcap shoot ... --devices 67DF6727-31BC-4246-9FC0-313A22FB2A6C
+```
+
+Names are matched case-insensitively and hyphen/dash-insensitively. When the same name exists on several iOS runtimes, the **newest runtime** wins. Output subdirectories use the name you passed (or the device slug when using a UDID).
+
+### Shot config
+
+`shots.json` gives full control over names, scenes, and settle times. Every field except `name` and `scene` is optional.
+
+```json
+{
+  "shots": [
+    { "name": "04_home.png", "scene": "home", "wait": 8 },
+    { "name": "01_trace.png", "scene": "trace", "strokes": 1, "wait": 6 },
+    { "name": "06_store.png", "scene": "store", "wait": 8 },
+    { "name": "07_store_tip.png", "scene": "store", "scrollBottom": true, "wait": 8 }
+  ]
+}
+```
+
+| Field | Type | Default | Meaning |
+|---|---|---|---|
+| `name` | string | — | Output filename, e.g. `04_home.png` |
+| `scene` | string | — | Scene name passed as `--screenshot-scene` |
+| `strokes` | int | `nil` | Passed as `--screenshot-strokes` |
+| `scrollBottom` | bool | `false` | Passes `--screenshot-scroll-bottom` |
+| `wait` | int | `6` | Seconds to wait after launch before capturing |
+| `uiTesting` | bool | `true` | Whether to pass `--ui-testing` |
+
+The file may be either a bare array of shots or `{ "shots": [...] }`.
+
+## Screenshot scene protocol
+
+simcap launches your app with a fixed argument set. **Your app owns the scene names and what they do** — simcap only passes them through.
+
+| Argument | Meaning |
+|---|---|
+| `--ui-testing` | Tell the app this is an automated session (skip onboarding etc.). |
+| `--screenshot-scene <scene>` | Navigate to the named scene on launch. |
+| `--screenshot-strokes <N>` | Perform N interactions (e.g. draw N strokes). Optional. |
+| `--screenshot-scroll-bottom` | Scroll the scene to the bottom before capturing. Optional. |
+
+In addition, simcap always passes `-AppleLanguages (lang)` and `-AppleLocale locale` so the app renders in the requested language.
+
+### App-side implementation (SwiftUI)
+
+```swift
+import SwiftUI
+
+struct HomeView: View {
+    @State private var path: [Character] = []
+    @State private var showSettings = false
+
+    var body: some View {
+        NavigationStack(path: $path) {
+            content
+                .onAppear {
+                    #if DEBUG
+                    handleScreenshotScene()
+                    #endif
+                }
+        }
+        .sheet(isPresented: $showSettings) {
+            SettingsView()
+        }
+    }
+
+    #if DEBUG
+    /// Screenshot-capture support: interpret simcap's launch arguments.
+    private func handleScreenshotScene() {
+        let args = ProcessInfo.processInfo.arguments
+        guard let index = args.firstIndex(of: "--screenshot-scene"),
+              index + 1 < args.count else { return }
+        let scene = args[index + 1]
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            switch scene {
+            case "detail":
+                if let first = characters.first {
+                    path = [first]
+                }
+            case "settings":
+                showSettings = true
+            default:
+                break // "home" is the default screen
+            }
+        }
+    }
+    #endif
+}
+```
+
+Because the handler lives behind `#if DEBUG`, it never ships in a release build.
+
+## Resizing
+
+`--resize` writes App Store-ready copies to `<output>/<device>/<lang>/`. simcap:
+
+1. Detects the raw capture's aspect ratio and picks the matching App Store size (exact dimension match first — this disambiguates same-ratio devices like the iPad Pro 13" and iPad 10.2").
+2. Flattens any alpha channel onto white.
+3. Resizes with high-quality interpolation (LANCZOS-equivalent) and writes PNG.
+
+Supported targets:
+
+| Size | Device |
+|---|---|
+| 1320×2868 | iPhone 16 Pro Max / 17 Pro Max (6.9") |
+| 1290×2796 | iPhone 15 Pro Max (6.7") |
+| 1242×2688 | iPhone 11 Pro Max (6.5") |
+| 2064×2752 | iPad Pro 13-inch |
+| 2048×2732 | iPad Pro 12.9-inch |
+| 2266×1488 | iPad Pro 11-inch |
+| 2160×1620 | iPad 10.2-inch |
+
+If no target matches (within 1% aspect ratio), simcap warns and keeps the raw capture.
+
+## Output layout
+
+```
+appstore/
+├── raw/
+│   └── iphone-17-pro-max/
+│       ├── ja/
+│       │   ├── 04_home.png
+│       │   └── 01_trace.png
+│       └── en/
+│           └── 04_home.png
+└── iphone-17-pro-max/            # --resize: App Store-ready copies
+    └── ja/
+        └── 04_home.png
+```
+
+## Reliability
+
+- **Timeout**: every external command (xcodebuild, simctl, …) is killed if it exceeds `--timeout`. A hung simulator can never stall a CI job.
+- **Retries**: `launch`, `install`, and `screenshot` retry on failure.
+- **Per-device isolation**: a failing device is reported and skipped without aborting the rest of the matrix.
+- **Clean state**: the app is uninstalled before install, and `--keep-running`/`--no-clean` are opt-outs if you want to preserve state.
+
+## Development
+
+```bash
+swift build   # build
+swift test    # run tests
+swift run simcap shoot --help
+```
+
+## License
+
+[MIT](LICENSE)

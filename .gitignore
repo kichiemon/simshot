@@ -1,0 +1,17 @@
+# SwiftPM
+.build/
+.swiftpm/
+DerivedData/
+
+# Xcode
+xcuserdata/
+*.xcuserstate
+*.xccheckout
+
+# simcap output
+appstore/
+screenshots/
+output/
+
+# macOS
+.DS_Store
