@@ -36,7 +36,7 @@ simcap shoot --project Kanapp.xcodeproj --scheme Kanapp \
 ### ソースからビルド
 
 ```bash
-git clone https://github.com/kichiemon/simcap.git
+git clone https://github.com/kichiemon/simshot.git
 cd simcap
 swift build -c release
 # バイナリは .build/release/simcap

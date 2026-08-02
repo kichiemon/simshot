@@ -36,7 +36,7 @@ Every external command runs through a **timeout + retry** wrapper, so a crashed 
 ### Build from source
 
 ```bash
-git clone https://github.com/kichiemon/simcap.git
+git clone https://github.com/kichiemon/simshot.git
 cd simcap
 swift build -c release
 # binary at .build/release/simcap — symlink or copy it into your PATH
@@ -57,8 +57,8 @@ brew install simcap
 ```ruby
 class Simcap < Formula
   desc "App Store screenshot capture CLI (simctl only, no XCUITest)"
-  homepage "https://github.com/kichiemon/simcap"
-  url "https://github.com/kichiemon/simcap/archive/refs/tags/v0.1.0.tar.gz"
+  homepage "https://github.com/kichiemon/simshot"
+  url "https://github.com/kichiemon/simshot/archive/refs/tags/v0.1.0.tar.gz"
   sha256 "REPLACE_WITH_RELEASE_SHA256"
   license "MIT"
 
