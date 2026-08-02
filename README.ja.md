@@ -67,6 +67,36 @@ swift build -c release
 ln -s "$(pwd)/.build/release/simshot" /usr/local/bin/simshot
 ```
 
+### 単体バイナリ (curl, macOS)
+
+GitHub Releases から対応アーキテクチャのプリビルドバイナリを直接取得します（Swift ツールチェイン不要）:
+
+```bash
+# Apple Silicon (arm64)
+curl -sL https://github.com/kichiemon/simshot/releases/download/v0.1.1/simshot-macos-arm64 -o /usr/local/bin/simshot && chmod +x /usr/local/bin/simshot
+
+# Intel (x86_64)
+curl -sL https://github.com/kichiemon/simshot/releases/download/v0.1.1/simshot-macos-x86_64 -o /usr/local/bin/simshot && chmod +x /usr/local/bin/simshot
+```
+
+### Nix
+
+リポジトリには [`flake.nix`](flake.nix) が同梱されており、プリビルド単体バイナリを取得します（ソースビルドなし）:
+
+```bash
+nix run github:kichiemon/simshot          # インストールせず実行
+nix profile install github:kichiemon/simshot   # プロファイルへインストール
+```
+
+### mise（ubi）
+
+[mise](https://mise.jdx.dev/) は [ubi](https://github.com/houseabsolute/ubi) バックエンド経由で `simshot-macos-{os}-{arch}` のリリースアセットを解決して simshot をインストールできます:
+
+```bash
+mise use -g ubi:kichiemon/simshot   # グローバル設定へインストール
+simshot --version                   # v0.1.1
+```
+
 ### Homebrew (tap)
 
 ```bash
@@ -83,7 +113,7 @@ npm i -g simshot
 npx simshot shoot
 ```
 
-macOS（arm64 / x64）+ Node.js 14+ が必要です。`postinstall` で GitHub Releases から対応アーキテクチャのプリビルドバイナリをダウンロードします（実装は [`npm/`](npm/)）。npm 版は publish 準備のみで、npm アカウントログインが必要なため未公開です。公開までは Homebrew またはソースからのビルドを利用してください。
+macOS（arm64 / x86_64）+ Node.js 14+ が必要です。`postinstall` で GitHub Releases から対応アーキテクチャのプリビルド単体バイナリをダウンロードし、sha256 を検証します（実装は [`npm/`](npm/)）。npm 版は publish 準備のみで、npm アカウントログインが必要なため未公開です。公開までは curl ワンライナー・Homebrew・Nix・mise を利用してください。
 
 ## クイックスタート
 

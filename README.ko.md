@@ -67,6 +67,36 @@ swift build -c release
 ln -s "$(pwd)/.build/release/simshot" /usr/local/bin/simshot
 ```
 
+### 단일 바이너리 (curl, macOS)
+
+GitHub Releases에서 해당 아키텍처의 프리빌드 바이너리를 직접 받습니다(Swift 툴체인 불필요):
+
+```bash
+# Apple Silicon (arm64)
+curl -sL https://github.com/kichiemon/simshot/releases/download/v0.1.1/simshot-macos-arm64 -o /usr/local/bin/simshot && chmod +x /usr/local/bin/simshot
+
+# Intel (x86_64)
+curl -sL https://github.com/kichiemon/simshot/releases/download/v0.1.1/simshot-macos-x86_64 -o /usr/local/bin/simshot && chmod +x /usr/local/bin/simshot
+```
+
+### Nix
+
+리포지토리에 [`flake.nix`](flake.nix)가 포함되어 있으며 프리빌드 단일 바이너리를 가져옵니다(소스 빌드 없음):
+
+```bash
+nix run github:kichiemon/simshot          # 설치 없이 실행
+nix profile install github:kichiemon/simshot   # 프로필에 설치
+```
+
+### mise (ubi)
+
+[mise](https://mise.jdx.dev/)는 [ubi](https://github.com/houseabsolute/ubi) 백엔드를 통해 `simshot-macos-{os}-{arch}` 릴리스 에셋을 해석하여 simshot을 설치할 수 있습니다:
+
+```bash
+mise use -g ubi:kichiemon/simshot   # 전역 설정에 설치
+simshot --version                   # v0.1.1
+```
+
 ### Homebrew (tap)
 
 ```bash
@@ -83,7 +113,7 @@ npm i -g simshot
 npx simshot shoot
 ```
 
-macOS(arm64 / x64) + Node.js 14+가 필요합니다. `postinstall`에서 GitHub Releases의 해당 아키텍처 프리빌드 바이너리를 다운로드합니다(구현은 [`npm/`](npm/)). npm 버전은 publish 준비만 되어 있으며, npm 계정 로그인이 필요해 아직 미공개입니다. 공개 전까지는 Homebrew 또는 소스 빌드를 이용하세요.
+macOS(arm64 / x86_64) + Node.js 14+가 필요합니다. `postinstall`에서 GitHub Releases의 해당 아키텍처 프리빌드 단일 바이너리를 다운로드하고 sha256을 검증합니다(구현은 [`npm/`](npm/)). npm 버전은 publish 준비만 되어 있으며, npm 계정 로그인이 필요해 아직 미공개입니다. 공개 전까지는 curl 원라이너·Homebrew·Nix·mise를 이용하세요.
 
 ## 퀵스타트
 

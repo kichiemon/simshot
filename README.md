@@ -75,6 +75,36 @@ swift build -c release
 ln -s "$(pwd)/.build/release/simshot" /usr/local/bin/simshot
 ```
 
+### Single binary (curl, macOS)
+
+Grab the prebuilt binary for your architecture directly from GitHub Releases — no Swift toolchain required:
+
+```bash
+# Apple Silicon (arm64)
+curl -sL https://github.com/kichiemon/simshot/releases/download/v0.1.1/simshot-macos-arm64 -o /usr/local/bin/simshot && chmod +x /usr/local/bin/simshot
+
+# Intel (x86_64)
+curl -sL https://github.com/kichiemon/simshot/releases/download/v0.1.1/simshot-macos-x86_64 -o /usr/local/bin/simshot && chmod +x /usr/local/bin/simshot
+```
+
+### Nix
+
+The repo ships a [`flake.nix`](flake.nix) that fetches the prebuilt single binary (no source build):
+
+```bash
+nix run github:kichiemon/simshot          # run without installing
+nix profile install github:kichiemon/simshot   # install into your profile
+```
+
+### mise (ubi)
+
+[mise](https://mise.jdx.dev/) installs simshot through its [ubi](https://github.com/houseabsolute/ubi) backend, which resolves the `simshot-macos-{os}-{arch}` release assets:
+
+```bash
+mise use -g ubi:kichiemon/simshot   # install into your global config
+simshot --version                   # v0.1.1
+```
+
 ### Homebrew (tap, recommended)
 
 simshot ships a tap formula that installs the prebuilt release binary. First time:
@@ -90,10 +120,10 @@ brew install simshot
 class Simshot < Formula
   desc "App Store screenshot capture CLI (simctl only, no XCUITest)"
   homepage "https://github.com/kichiemon/simshot"
-  url "https://github.com/kichiemon/simshot/releases/download/v0.1.0/simshot-macos-arm64.tar.gz"
-  sha256 "a6e920b1445be3e93b436816773b5bda55f545f4b3a9530d0609d9961da3ce32"
+  url "https://github.com/kichiemon/simshot/releases/download/v0.1.1/simshot-macos-arm64.tar.gz"
+  sha256 "b1281c510109d86ecc1adcae223029694f21c9fa1f5a3d9abb4b95772cf25064"
   license "MIT"
-  version "0.1.0"
+  version "0.1.1"
 
   def install
     bin.install "simshot"
@@ -108,7 +138,7 @@ npm i -g simshot
 npx simshot shoot
 ```
 
-Requires Node.js 14+ on macOS (arm64/x64). The package downloads the matching prebuilt binary from GitHub Releases in `postinstall` (see [`npm/`](npm/)). The npm package is prepared but not yet published (publishing requires an npm account) — until then use Homebrew or build from source.
+Requires Node.js 14+ on macOS (arm64/x86_64). The package downloads the matching prebuilt single binary from GitHub Releases in `postinstall` (see [`npm/`](npm/)) and verifies its sha256. The npm package is prepared but not yet published (publishing requires an npm account) — until then use the curl one-liner, Homebrew, Nix, or mise.
 
 ## Quick start
 
