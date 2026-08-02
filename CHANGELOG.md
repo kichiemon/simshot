@@ -5,16 +5,27 @@ All notable changes to simshot are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.1.1] - 2026-08-02
 
 ### Added
 
+- Single binary distribution: `arm64 + x86_64` universal build; GitHub Releases
+  now attach raw `simshot-macos-arm64` / `simshot-macos-x86_64` executables, plus
+  `.tar.gz` archives and `.sha256` checksums for each. This enables `curl`
+  one-liner, `nix`, `mise (ubi)`, and npm installs without a Swift toolchain.
+- One-line curl install (`curl -sL .../simshot-macos-{arm64,x86_64} -o /usr/local/bin/simshot && chmod +x /usr/local/bin/simshot`).
+- `flake.nix` — fetches the prebuilt single binary from GitHub Releases via
+  `fetchurl`; supports `nix run github:kichiemon/simshot` and
+  `nix profile install github:kichiemon/simshot`.
+- mise/ubi install path (`mise use ubi:kichiemon/simshot`) — ubi resolves the
+  `simshot-macos-{os}-{arch}` release assets.
+- npm `install.js` now downloads the single binary directly (arm64/x86_64) with
+  sha256 verification; publishing to npm still requires an npm account, so the
+  package is prepared but not published.
 - Homebrew tap formula at [`kichiemon/homebrew-tap`](https://github.com/kichiemon/homebrew-tap)
-  (`Formula/simshot.rb`) installing the prebuilt `v0.1.0` binary.
-- npm distribution package (`npm/`): `package.json`, `install.js` (downloads the
-  matching macOS arm64/x64 binary from GitHub Releases in `postinstall`) and a
-  `cli.js` bin wrapper. Prepared for `npm i -g simshot` / `npx simshot shoot`;
-  publishing requires an npm account and is not done yet.
+  (`Formula/simshot.rb`) updated to the `v0.1.1` prebuilt binary.
+- npm distribution package (`npm/`): `package.json`, `install.js`, and a
+  `cli.js` bin wrapper.
 
 ## [0.1.0] - 2026-08-02
 
@@ -39,5 +50,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   (`.github/workflows/release.yml`).
 - README in English, Japanese, and Korean.
 
-[Unreleased]: https://github.com/kichiemon/simshot/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/kichiemon/simshot/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/kichiemon/simshot/releases/tag/v0.1.1
 [0.1.0]: https://github.com/kichiemon/simshot/releases/tag/v0.1.0
