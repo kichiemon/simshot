@@ -340,7 +340,7 @@ appstore/
 ```bash
 swift build   # build
 swift test    # run tests
-swift-format lint --recursive Sources Tests   # code style
+swift format lint --recursive Sources Tests   # code style
 swift run simshot shoot --help
 ```
 

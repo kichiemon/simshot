@@ -7,7 +7,7 @@ simshot — App Store screenshot capture CLI (simctl only, no XCUITest).
 ```bash
 swift build                # build the CLI (product: simshot)
 swift test                 # run the test suite
-swift-format lint --recursive Sources Tests   # code style check
+swift format lint --recursive Sources Tests   # code style check
 swift run simshot shoot --help   # CLI help
 swift run simshot devices    # list available simulators
 swift run simshot doctor     # diagnose the local Xcode/simulator environment
@@ -47,5 +47,5 @@ swift run simshot init --yes # generate a simshot.yml scaffold
 Before committing, run:
 
 ```bash
-swift-format lint --recursive Sources Tests && swift build && swift test
+swift format lint --recursive Sources Tests && swift build && swift test
 ```

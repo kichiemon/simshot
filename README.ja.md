@@ -321,7 +321,7 @@ appstore/
 ```bash
 swift build   # ビルド
 swift test    # テスト実行
-swift-format lint --recursive Sources Tests   # コードスタイル
+swift format lint --recursive Sources Tests   # コードスタイル
 swift run simshot shoot --help
 ```
 

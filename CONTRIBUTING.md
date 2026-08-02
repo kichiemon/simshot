@@ -37,7 +37,7 @@ agree on the direction before you invest time in code.
 3. Make sure formatting and tests pass:
 
    ```bash
-   swift-format lint --recursive Sources Tests
+   swift format lint --recursive Sources Tests
    swift build && swift test
    ```
 

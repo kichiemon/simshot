@@ -8,7 +8,7 @@
 
 ## Before submitting
 
-- [ ] Ran `swift-format lint --recursive Sources Tests` with no warnings
+- [ ] Ran `swift format lint --recursive Sources Tests` with no warnings
 - [ ] Ran `swift build && swift test` — all tests pass
 - [ ] Updated `README.md`, `README.ja.md`, `README.ko.md`, and `llms.txt` if
       user-facing behavior changed
