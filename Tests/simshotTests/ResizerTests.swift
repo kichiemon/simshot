@@ -1,5 +1,5 @@
 import XCTest
-@testable import SimcapCore
+@testable import SimshotCore
 
 final class DeviceSpecTests: XCTestCase {
     func testMatchTargetiPhoneProMaxSizes() {
@@ -63,7 +63,7 @@ final class ResizerTests: XCTestCase {
 
     func testWritePNGAndReload() throws {
         let tempDir = FileManager.default.temporaryDirectory
-            .appendingPathComponent("simcap-tests-\(UUID().uuidString)")
+            .appendingPathComponent("simshot-tests-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: tempDir, withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(at: tempDir) }
 
@@ -78,7 +78,7 @@ final class ResizerTests: XCTestCase {
 
     func testMakeAppStoreImage() throws {
         let tempDir = FileManager.default.temporaryDirectory
-            .appendingPathComponent("simcap-tests-\(UUID().uuidString)")
+            .appendingPathComponent("simshot-tests-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: tempDir, withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(at: tempDir) }
 

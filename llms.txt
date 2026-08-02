@@ -1,0 +1,53 @@
+# simshot
+
+> App Store screenshot capture CLI — simctl only, no XCUITest, no hangs.
+
+simshot captures App Store-ready screenshots from the iOS Simulator by driving `simctl` directly (build → boot → status bar override → launch with scene args → `io screenshot` → resize). The app under test implements a tiny `#if DEBUG` launch-argument handler to navigate to each scene.
+
+- Repo: <https://github.com/kichiemon/simshot>
+- License: MIT
+- Written in Swift (SwiftPM), macOS 13+, zero third-party dependencies.
+
+## Key facts
+
+- Binary/product name: `simshot`; core library module: `SimshotCore`; test target: `simshotTests`.
+- Commands: `simshot shoot`, `simshot devices`, `simshot version`, `simshot help`.
+- `simshot shoot` flags: `--project`/`--workspace`/`--scheme`, `--app-path`, `--bundle-id`, `--devices`, `--langs`, `--locales`, `--shots <config.json>`, `--scenes`, `--wait`, `--output`, `--resize`, `--derived-data`, `--timeout`, `--status-bar-time`, `--status-bar-battery`, `--no-ui-testing`, `--no-clean`, `--keep-running`, `--verbose`.
+- Output layout: `appstore/raw/<device>/<lang>/NN_name.png` (raw) and `appstore/<device>/<lang>/NN_name.png` (App Store-ready when `--resize`).
+- App Store size targets: 1320×2868, 1290×2796, 1242×2688 (iPhone), 2064×2752, 2048×2732, 2266×1488, 2160×1620 (iPad); alpha is flattened to white; resizing is LANCZOS-equivalent via CoreGraphics/ImageIO.
+
+## Screenshot scene protocol (public contract)
+
+simshot launches the app with:
+
+```
+--ui-testing
+--screenshot-scene <scene>
+--screenshot-strokes <N>        (optional)
+--screenshot-scroll-bottom      (optional)
+```
+
+plus `-AppleLanguages (lang)` and `-AppleLocale <locale>`. The app must interpret these under `#if DEBUG` to navigate to the scene. Scene names and behaviors are owned by the app; simshot only passes them through. Changing this protocol requires updating `README.md`, `README.ja.md`, `README.ko.md`, and `Sources/SimshotCore/ShotSpec.swift`.
+
+## Documentation
+
+- [README (English)](README.md)
+- [README (日本語)](README.ja.md)
+- [README (한국어)](README.ko.md)
+- [Shot config example](examples/shots.json)
+- [MIT License](LICENSE)
+
+## Install
+
+- npx (agent skill): `npx skills add kichiemon/simshot`
+- Build from source: `swift build -c release` (binary at `.build/release/simshot`)
+- Homebrew: `brew tap kichiemon/homebrew-tap && brew install simshot`
+
+## Build & test
+
+```bash
+swift build   # build
+swift test    # run tests (XCTest)
+```
+
+CI runs on `macos-latest` (`.github/workflows/ci.yml`); releases are cut from `v*` tags (`.github/workflows/release.yml`).

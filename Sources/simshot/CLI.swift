@@ -1,5 +1,5 @@
 import Foundation
-import SimcapCore
+import SimshotCore
 
 enum Command {
     case shoot(ShootOptions)
@@ -9,7 +9,7 @@ enum Command {
 }
 
 @main
-struct SimcapCLI {
+struct SimshotCLI {
     static func main() {
         let args = Array(CommandLine.arguments.dropFirst())
         do {
@@ -40,7 +40,7 @@ struct SimcapCLI {
         case "help", "--help", "-h":
             return .help
         default:
-            throw SimcapError.usage("Unknown command '\(args[0])'")
+            throw SimshotError.usage("Unknown command '\(args[0])'")
         }
     }
 
@@ -51,7 +51,7 @@ struct SimcapCLI {
         case .devices:
             try listDevices()
         case .version:
-            print("simcap \(simcapVersion)")
+            print("simshot \(simshotVersion)")
         case .help:
             print(Help.main)
         }

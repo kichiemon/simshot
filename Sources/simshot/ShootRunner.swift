@@ -1,5 +1,5 @@
 import Foundation
-import SimcapCore
+import SimshotCore
 
 public struct ShootRunner {
     let options: ShootOptions
@@ -17,7 +17,7 @@ public struct ShootRunner {
             appURL = appPath
         } else {
             guard let scheme = options.scheme else {
-                throw SimcapError.usage("--scheme is required")
+                throw SimshotError.usage("--scheme is required")
             }
             appURL = try XcodeBuild.build(
                 project: options.project,
@@ -52,7 +52,7 @@ public struct ShootRunner {
         }
 
         if !failures.isEmpty {
-            throw SimcapError.commandFailed("Capture failed for:\n- " + failures.joined(separator: "\n- "))
+            throw SimshotError.commandFailed("Capture failed for:\n- " + failures.joined(separator: "\n- "))
         }
         Log.info("✅ Done! Screenshots saved to \(options.outputDir)/")
     }

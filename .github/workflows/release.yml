@@ -1,0 +1,35 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: macos-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Swift version
+        run: swift --version
+
+      - name: Build release binary
+        run: swift build -c release --disable-sandbox
+
+      - name: Package binary
+        run: |
+          mkdir -p dist
+          cp .build/release/simshot dist/simshot
+          tar -czf "dist/simshot-macos-$(uname -m).tar.gz" -C dist simshot
+          shasum -a 256 "dist/simshot-macos-$(uname -m).tar.gz" > "dist/simshot-macos-$(uname -m).tar.gz.sha256"
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: simshot ${{ github.ref_name }}
+          files: dist/*.tar.gz*
+          generate_release_notes: true

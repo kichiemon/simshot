@@ -1,5 +1,5 @@
 import Foundation
-import SimcapCore
+import SimshotCore
 
 public struct ShootOptions {
     public var project: String?
@@ -15,7 +15,7 @@ public struct ShootOptions {
     public var outputDir = "appstore"
     public var derivedData = FileManager.default
         .homeDirectoryForCurrentUser
-        .appendingPathComponent(".simcap/DerivedData")
+        .appendingPathComponent(".simshot/DerivedData")
         .path
     public var timeout: TimeInterval = 300
     public var wait = 6
@@ -38,7 +38,7 @@ public enum ArgParser {
         func takeValue(for flag: String, inline: String?, _ index: inout Int) throws -> String {
             if let inline { return inline }
             guard index + 1 < args.count else {
-                throw SimcapError.usage("Missing value for \(flag)")
+                throw SimshotError.usage("Missing value for \(flag)")
             }
             index += 1
             return args[index]
@@ -47,7 +47,7 @@ public enum ArgParser {
         while index < args.count {
             let raw = args[index]
             guard raw.hasPrefix("--") || raw.hasPrefix("-"), !raw.isEmpty else {
-                throw SimcapError.usage("Unexpected positional argument '\(raw)'")
+                throw SimshotError.usage("Unexpected positional argument '\(raw)'")
             }
             var flag = raw
             var inline: String?
@@ -83,19 +83,19 @@ public enum ArgParser {
                 options.derivedData = try takeValue(for: flag, inline: inline, &index)
             case "--timeout":
                 guard let value = TimeInterval(try takeValue(for: flag, inline: inline, &index)) else {
-                    throw SimcapError.usage("--timeout must be a number of seconds")
+                    throw SimshotError.usage("--timeout must be a number of seconds")
                 }
                 options.timeout = value
             case "--wait":
                 guard let value = Int(try takeValue(for: flag, inline: inline, &index)) else {
-                    throw SimcapError.usage("--wait must be an integer number of seconds")
+                    throw SimshotError.usage("--wait must be an integer number of seconds")
                 }
                 options.wait = value
             case "--status-bar-time":
                 options.statusBarTime = try takeValue(for: flag, inline: inline, &index)
             case "--status-bar-battery":
                 guard let value = Int(try takeValue(for: flag, inline: inline, &index)) else {
-                    throw SimcapError.usage("--status-bar-battery must be an integer")
+                    throw SimshotError.usage("--status-bar-battery must be an integer")
                 }
                 options.statusBarBattery = value
             case "--resize":
@@ -109,7 +109,7 @@ public enum ArgParser {
             case "--verbose", "-v":
                 options.verbose = true
             default:
-                throw SimcapError.usage("Unknown option '\(raw)'. Run `simcap shoot --help`.")
+                throw SimshotError.usage("Unknown option '\(raw)'. Run `simshot shoot --help`.")
             }
             index += 1
         }
@@ -121,24 +121,24 @@ public enum ArgParser {
     static func validate(_ options: inout ShootOptions) throws {
         if options.appPath == nil {
             guard options.project != nil || options.workspace != nil else {
-                throw SimcapError.usage("Either --project/--workspace or --app-path is required.")
+                throw SimshotError.usage("Either --project/--workspace or --app-path is required.")
             }
             guard let scheme = options.scheme, !scheme.isEmpty else {
-                throw SimcapError.usage("--scheme is required.")
+                throw SimshotError.usage("--scheme is required.")
             }
         }
         guard !options.bundleID.isEmpty else {
-            throw SimcapError.usage("--bundle-id is required.")
+            throw SimshotError.usage("--bundle-id is required.")
         }
         guard !options.devices.isEmpty else {
-            throw SimcapError.usage("--devices is required (e.g. iphone-17-pro-max,ipad-pro-13).")
+            throw SimshotError.usage("--devices is required (e.g. iphone-17-pro-max,ipad-pro-13).")
         }
         if options.languages.isEmpty {
             options.languages = ["en"]
         }
         if options.shots.isEmpty {
             guard !options.scenes.isEmpty else {
-                throw SimcapError.usage("Provide --shots <config.json> or --scenes home,trace,...")
+                throw SimshotError.usage("Provide --shots <config.json> or --scenes home,trace,...")
             }
             options.shots = options.scenes.map {
                 Shot(name: "\($0).png", scene: $0, wait: options.wait, uiTesting: options.uiTesting)
@@ -157,7 +157,7 @@ public enum ArgParser {
         for pair in csv(value) {
             let parts = pair.split(separator: "=")
             guard parts.count == 2 else {
-                throw SimcapError.usage("Invalid --locales entry '\(pair)' (expected lang=locale)")
+                throw SimshotError.usage("Invalid --locales entry '\(pair)' (expected lang=locale)")
             }
             result[String(parts[0])] = String(parts[1])
         }
@@ -170,7 +170,7 @@ public enum ArgParser {
         do {
             data = try Data(contentsOf: url)
         } catch {
-            throw SimcapError.notFound("Cannot read shots config: \(path)")
+            throw SimshotError.notFound("Cannot read shots config: \(path)")
         }
         let decoder = JSONDecoder()
         if let file = try? decoder.decode(ShotsFile.self, from: data) {
@@ -179,7 +179,7 @@ public enum ArgParser {
         if let shots = try? decoder.decode([Shot].self, from: data) {
             return shots
         }
-        throw SimcapError.invalid(
+        throw SimshotError.invalid(
             "shots config must be a JSON array of shots or { \"shots\": [...] }. See README."
         )
     }

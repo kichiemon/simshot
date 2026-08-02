@@ -25,7 +25,7 @@ public enum ProcessRunner {
         var stderrData = Data()
         let lock = NSLock()
         let group = DispatchGroup()
-        let queue = DispatchQueue(label: "simcap.pipe.reader", qos: .utility, attributes: .concurrent)
+        let queue = DispatchQueue(label: "simshot.pipe.reader", qos: .utility, attributes: .concurrent)
 
         if captureOutput {
             let stdoutPipe = Pipe()
@@ -49,7 +49,7 @@ public enum ProcessRunner {
         do {
             try process.run()
         } catch {
-            throw SimcapError.commandFailed("Failed to launch \(executable): \(error)")
+            throw SimshotError.commandFailed("Failed to launch \(executable): \(error)")
         }
 
         let deadline = Date().addingTimeInterval(timeout)
@@ -76,7 +76,7 @@ public enum ProcessRunner {
         let stderr = String(data: stderrData, encoding: .utf8) ?? ""
 
         if timedOut {
-            throw SimcapError.timeout("\(executable) \(args.joined(separator: " "))")
+            throw SimshotError.timeout("\(executable) \(args.joined(separator: " "))")
         }
         return ProcessResult(status: process.terminationStatus, stdout: stdout, stderr: stderr)
     }

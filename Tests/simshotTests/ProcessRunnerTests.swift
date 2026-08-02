@@ -1,11 +1,11 @@
 import XCTest
-@testable import SimcapCore
+@testable import SimshotCore
 
 final class ProcessRunnerTests: XCTestCase {
     func testSuccessfulRunCapturesOutput() throws {
-        let result = try ProcessRunner.run("/bin/echo", ["hello simcap"], timeout: 10)
+        let result = try ProcessRunner.run("/bin/echo", ["hello simshot"], timeout: 10)
         XCTAssertEqual(result.status, 0)
-        XCTAssertEqual(result.stdout.trimmingCharacters(in: .whitespacesAndNewlines), "hello simcap")
+        XCTAssertEqual(result.stdout.trimmingCharacters(in: .whitespacesAndNewlines), "hello simshot")
     }
 
     func testNonZeroExit() throws {
@@ -19,7 +19,7 @@ final class ProcessRunnerTests: XCTestCase {
             try ProcessRunner.run("/bin/sleep", ["30"], timeout: 1),
             "expected timeout"
         ) { error in
-            guard case SimcapError.timeout = error else {
+            guard case SimshotError.timeout = error else {
                 return XCTFail("expected .timeout, got \(error)")
             }
         }

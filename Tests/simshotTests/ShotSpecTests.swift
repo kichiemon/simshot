@@ -1,5 +1,5 @@
 import XCTest
-@testable import SimcapCore
+@testable import SimshotCore
 
 final class ShotSpecTests: XCTestCase {
     func testLocaleMap() {

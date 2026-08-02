@@ -1,6 +1,6 @@
 import Foundation
 
-public enum SimcapError: Error, CustomStringConvertible {
+public enum SimshotError: Error, CustomStringConvertible {
     case usage(String)
     case commandFailed(String)
     case timeout(String)
@@ -51,4 +51,4 @@ public enum Log {
     }
 }
 
-public let simcapVersion = "0.1.0"
+public let simshotVersion = "0.1.0"

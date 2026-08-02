@@ -33,12 +33,12 @@ public struct Simulator: Equatable {
             timeout: 30
         )
         guard result.status == 0 else {
-            throw SimcapError.commandFailed("`simctl list devices` failed:\n\(result.stderr)")
+            throw SimshotError.commandFailed("`simctl list devices` failed:\n\(result.stderr)")
         }
         guard let data = result.stdout.data(using: .utf8),
               let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
               let devices = json["devices"] as? [String: Any] else {
-            throw SimcapError.invalid("Could not parse `simctl list devices -j` output.")
+            throw SimshotError.invalid("Could not parse `simctl list devices -j` output.")
         }
 
         var found: [Simulator] = []
@@ -65,7 +65,7 @@ public struct Simulator: Equatable {
             if let device = devices.first(where: { $0.udid.lowercased() == token.lowercased() }) {
                 return device
             }
-            throw SimcapError.notFound("No available simulator with UDID \(token). Run `simcap devices`.")
+            throw SimshotError.notFound("No available simulator with UDID \(token). Run `simshot devices`.")
         }
 
         // Name -> substring match, newest runtime wins per distinct name.
@@ -85,10 +85,10 @@ public struct Simulator: Equatable {
             return matches[0]
         }
         if matches.isEmpty {
-            throw SimcapError.notFound("No available simulator matching '\(token)'. Run `simcap devices` to list them.")
+            throw SimshotError.notFound("No available simulator matching '\(token)'. Run `simshot devices` to list them.")
         }
         let names = matches.map { "  \($0.name) (\($0.udid))" }.joined(separator: "\n")
-        throw SimcapError.invalid("'\(token)' matched multiple simulators:\n\(names)\nBe more specific.")
+        throw SimshotError.invalid("'\(token)' matched multiple simulators:\n\(names)\nBe more specific.")
     }
 
     /// Extract numeric version components from a runtime bundle ID,
@@ -122,7 +122,7 @@ public struct Simulator: Equatable {
             timeout: timeout
         )
         guard result.status == 0 else {
-            throw SimcapError.commandFailed("simctl bootstatus failed for \(name):\n\(result.stderr)")
+            throw SimshotError.commandFailed("simctl bootstatus failed for \(name):\n\(result.stderr)")
         }
     }
 
@@ -146,7 +146,7 @@ public struct Simulator: Equatable {
             timeout: 30
         )
         guard result.status == 0 else {
-            throw SimcapError.commandFailed("simctl status_bar override failed for \(name):\n\(result.stderr)")
+            throw SimshotError.commandFailed("simctl status_bar override failed for \(name):\n\(result.stderr)")
         }
     }
 
@@ -180,7 +180,7 @@ public struct Simulator: Equatable {
             Log.warn("⚠️  install attempt \(attempt) failed, retrying...")
             Thread.sleep(forTimeInterval: 2.0)
         }
-        throw SimcapError.commandFailed("simctl install failed for \(name):\n\(lastError)")
+        throw SimshotError.commandFailed("simctl install failed for \(name):\n\(lastError)")
     }
 
     public func launch(bundleID: String, arguments: [String], retries: Int = 2, timeout: TimeInterval = 60) throws {
@@ -197,7 +197,7 @@ public struct Simulator: Equatable {
                 Thread.sleep(forTimeInterval: 2.0)
             }
         }
-        throw SimcapError.commandFailed("simctl launch failed for \(bundleID) on \(name):\n\(lastError)")
+        throw SimshotError.commandFailed("simctl launch failed for \(bundleID) on \(name):\n\(lastError)")
     }
 
     public func terminate(bundleID: String) {
@@ -223,7 +223,7 @@ public struct Simulator: Equatable {
             Log.warn("⚠️  screenshot attempt \(attempt) failed: \(lastError.trimmingCharacters(in: .whitespacesAndNewlines))")
             Thread.sleep(forTimeInterval: 1.5)
         }
-        throw SimcapError.commandFailed("simctl screenshot failed on \(name):\n\(lastError)")
+        throw SimshotError.commandFailed("simctl screenshot failed on \(name):\n\(lastError)")
     }
 
     public func shutdown() {

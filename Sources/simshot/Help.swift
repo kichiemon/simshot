@@ -1,12 +1,12 @@
 enum Help {
     static let main = """
-    simcap — App Store screenshot capture CLI (simctl only, no XCUITest)
+    simshot — App Store screenshot capture CLI (simctl only, no XCUITest)
 
     USAGE:
-      simcap shoot <options>
-      simcap devices
-      simcap version
-      simcap help
+      simshot shoot <options>
+      simshot devices
+      simshot version
+      simshot help
 
     COMMANDS:
       shoot       Build the app, boot simulators, and capture App Store screenshots.
@@ -14,14 +14,14 @@ enum Help {
       version     Print the version.
       help        Show this help.
 
-    Run `simcap shoot --help` for all shoot options.
+    Run `simshot shoot --help` for all shoot options.
     """
 
     static let shoot = """
-    simcap shoot — capture App Store screenshots
+    simshot shoot — capture App Store screenshots
 
     USAGE:
-      simcap shoot --project <xcodeproj> --scheme <name> --bundle-id <id> \\
+      simshot shoot --project <xcodeproj> --scheme <name> --bundle-id <id> \\
                    --devices <list> [options]
 
     BUILD:
@@ -47,7 +47,7 @@ enum Help {
     OUTPUT:
       --output <dir>                 Output directory (default: appstore)
       --resize                       Also write App Store-ready resized copies (alpha removed)
-      --derived-data <dir>           DerivedData path (default: ~/.simcap/DerivedData)
+      --derived-data <dir>           DerivedData path (default: ~/.simshot/DerivedData)
 
     SIMULATOR:
       --timeout <secs>               Timeout for external commands (default: 300)
@@ -62,7 +62,7 @@ enum Help {
       --help, -h                     Show this help
 
     EXAMPLE:
-      simcap shoot --project Kanapp.xcodeproj --scheme Kanapp \\
+      simshot shoot --project Kanapp.xcodeproj --scheme Kanapp \\
         --bundle-id dev.kichiemon.kanapp \\
         --devices iphone-17-pro-max,ipad-pro-13 \\
         --langs ja,en --shots shots.json --resize

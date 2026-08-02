@@ -8,7 +8,7 @@ xcuserdata/
 *.xcuserstate
 *.xccheckout
 
-# simcap output
+# simshot output
 appstore/
 screenshots/
 output/

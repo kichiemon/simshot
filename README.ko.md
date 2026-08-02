@@ -1,0 +1,289 @@
+# simshot
+
+**[English](README.md) · [日本語](README.ja.md) · [한국어](README.ko.md)**
+
+iOS 시뮬레이터에서 **`simctl`만으로** App Store 제출용 스크린샷을 자동 촬영하는 CLI입니다. **XCUITest 불필요** · 테스트 러너 기인 행(hang) 없음.
+
+앱 쪽은 `#if DEBUG`로 기동 인자 프로토콜을 해석하는 작은 핸들러를 구현하기만 하면 됩니다. 이후 simshot이 「빌드 → 시뮬레이터 부팅 → 상태 바 덮어쓰기 → 각 씬으로 launch → 촬영 → App Store 크기로 리사이즈」까지 한 번에 처리합니다.
+
+```bash
+simshot shoot --project Kanapp.xcodeproj --scheme Kanapp \
+  --bundle-id dev.kichiemon.kanapp \
+  --devices iphone-17-pro-max,ipad-pro-13 \
+  --langs ja,en --shots shots.json --resize
+```
+
+## 왜 fastlane snapshot이 아닌가
+
+`fastlane snapshot`은 **XCUITest**로 UI를 조작하므로, 테스트 타깃 유지·깨지기 쉬운 요소 쿼리·러너 크래시와 싸워야 합니다. simshot은 모델을 뒤집었습니다.
+
+- **앱 자신**이 각 씬으로 이동합니다 (공개된 기동 인자 프로토콜을 해석).
+- simshot은 `simctl`(`bootstatus` / `status_bar` / `launch` / `io screenshot`)만 호출합니다. 모든 단계에 하드 타임아웃이 걸려 있어 절대 행하지 않습니다.
+- 테스트 번들도 `XCUITest`도 필요 없습니다. `#if DEBUG` 핸들러와 설정 파일뿐입니다.
+
+## 동작 원리
+
+1. `xcodebuild`로 generic simulator용 빌드(`--app-path`로 기존 `.app`도 가능).
+2. 디바이스 × 언어별로:
+   - `simctl bootstatus <udid> -b`로 부팅 및 대기.
+   - `simctl status_bar <udid> override --time "9:41" --batteryState charged --batteryLevel 100 ...`로 상태 바를 정돈.
+   - 앱 설치(이전 설치분은 제거하여 클린하게).
+   - 셧마다 씬 기동 인자로 launch → 씬이 안정될 때까지 대기 → `simctl io <udid> screenshot`.
+3. 원본은 `<output>/raw/<device>/<lang>/`, `--resize` 지정 시 알파 제거·리사이즈된 제출용 이미지를 `<output>/<device>/<lang>/`에 출력.
+
+모든 외부 명령은 **타임아웃＋리트라이** 래퍼를 거치므로, 크래시나 시뮬레이터 고착에도 CI를 멈추지 않습니다.
+
+## 설치
+
+### 에이전트 스킬로 설치 (npx)
+
+```bash
+npx skills add kichiemon/simshot
+```
+
+simshot을 재사용 가능한 에이전트 스킬로 도입합니다(Claude Code / opencode 등 스킬 지원 에이전트용).
+
+### 소스에서 빌드
+
+```bash
+git clone https://github.com/kichiemon/simshot.git
+cd simshot
+swift build -c release
+# 바이너리는 .build/release/simshot
+ln -s "$(pwd)/.build/release/simshot" /usr/local/bin/simshot
+```
+
+### Homebrew (tap)
+
+```bash
+brew tap kichiemon/homebrew-tap
+brew install simshot
+```
+
+Formula 양식은 [README.md](README.md#homebrew-tap-recommended)를 참조하세요.
+
+## 퀵스타트
+
+1. 앱에 [씬 기동 인자 핸들러](#screenshot-scene-protocol)를 추가(5분).
+2. 한 번 빌드 후 시뮬레이터 확인:
+
+   ```bash
+   simshot devices
+   ```
+
+3. `shots.json`을 작성([`examples/shots.json`](examples/shots.json) 참조)하거나 `--scenes` 사용:
+
+   ```bash
+   simshot shoot --project MyApp.xcodeproj --scheme MyApp \
+     --bundle-id com.example.myapp \
+     --devices iphone-17-pro-max,ipad-pro-13 \
+     --langs ja,en --scenes home,detail,settings \
+     --output appstore --resize
+   ```
+
+촬영 결과는 `appstore/<device>/<lang>/NN_name.png`에 저장됩니다.
+
+## 커맨드
+
+| 커맨드 | 설명 |
+|---|---|
+| `simshot shoot <options>` | 빌드·부팅·촬영·리사이즈 일괄 실행 |
+| `simshot devices` | 사용 가능한 시뮬레이터 목록(이름 + UDID) |
+| `simshot version` | 버전 표시 |
+| `simshot help` | 도움말 표시 |
+
+## `simshot shoot` 옵션
+
+```
+BUILD
+  --project <path.xcodeproj>       Xcode 프로젝트(--workspace와 배타)
+  --workspace <path.xcworkspace>   Xcode 워크스페이스
+  --scheme <name>                  Scheme 이름
+  --app-path <path.app>            빌드 없이 기존 .app 사용
+
+REQUIRED
+  --bundle-id <id>                 번들 식별자
+  --devices <list>                 시뮬레이터 이름 or UDID(쉼표 구분)
+
+SHOTS
+  --shots <config.json>            셧 설정 파일({ "shots": [...] })
+  --scenes <list>                  쇼트컷: 씬마다 1장(예 home,trace)
+  --wait <secs>                    --scenes용 대기 초(기본: 6)
+
+LOCALIZATION
+  --langs <list>                   언어(기본: en) 예: ja,en
+  --locales <map>                  lang=locale 오버라이드(예 ja=ja_JP,en=en_US)
+
+OUTPUT
+  --output <dir>                   출력 디렉터리(기본: appstore)
+  --resize                         App Store 제출용 이미지도 출력(알파 제거)
+  --derived-data <dir>             DerivedData 경로(기본: ~/.simshot/DerivedData)
+
+SIMULATOR
+  --timeout <secs>                 외부 명령 타임아웃(기본: 300)
+  --status-bar-time <t>            상태 바 시계(기본: 9:41)
+  --status-bar-battery <n>         상태 바 배터리%(기본: 100)
+  --no-ui-testing                  --ui-testing을 넘기지 않음
+  --no-clean                       설치 전에 제거하지 않음
+  --keep-running                   촬영 후 시뮬레이터를 종료하지 않음
+
+MISC
+  --verbose, -v                    상세 출력
+  --help, -h                       도움말 표시
+```
+
+### 디바이스 지정
+
+`--devices`는 디바이스 이름 또는 UDID를 받습니다:
+
+```bash
+simshot shoot ... --devices iphone-17-pro-max,ipad-pro-13
+simshot shoot ... --devices 67DF6727-31BC-4246-9FC0-313A22FB2A6C
+```
+
+이름은 대소문자·하이픈 구분을 무시하고 매칭합니다. 여러 iOS 런타임에 동명 디바이스가 있으면 **최신 런타임**을 우선합니다. 출력 하위 디렉터리는 전달한 이름(UDID의 경우 디바이스 이름 슬러그)이 됩니다.
+
+### 셧 설정
+
+`shots.json`으로 파일명·씬·대기 초를 세밀하게 제어할 수 있습니다. `name`과 `scene` 이외는 생략 가능합니다.
+
+```json
+{
+  "shots": [
+    { "name": "04_home.png", "scene": "home", "wait": 8 },
+    { "name": "01_trace.png", "scene": "trace", "strokes": 1, "wait": 6 },
+    { "name": "06_store.png", "scene": "store", "wait": 8 },
+    { "name": "07_store_tip.png", "scene": "store", "scrollBottom": true, "wait": 8 }
+  ]
+}
+```
+
+| 필드 | 타입 | 기본값 | 의미 |
+|---|---|---|---|
+| `name` | string | — | 출력 파일명(예 `04_home.png`) |
+| `scene` | string | — | `--screenshot-scene`으로 전달할 씬 이름 |
+| `strokes` | int | `nil` | `--screenshot-strokes`로 전달할 값 |
+| `scrollBottom` | bool | `false` | `--screenshot-scroll-bottom` 전달 |
+| `wait` | int | `6` | launch 후 촬영까지 대기 초 |
+| `uiTesting` | bool | `true` | `--ui-testing` 전달 여부 |
+
+파일 형식은 셧의 단순 배열 또는 `{ "shots": [...] }` 모두 가능합니다.
+
+## Screenshot scene protocol (씬 기동 인자 프로토콜)
+
+simshot은 앱을 고정 인자 세트로 launch합니다. **씬 이름과 동작은 앱 쪽 자유** — simshot은 그대로 전달할 뿐입니다.
+
+| 인자 | 의미 |
+|---|---|
+| `--ui-testing` | 자동 촬영 세션임을 알림(온보딩 등 스킵). |
+| `--screenshot-scene <scene>` | 기동 직후 지정 씬으로 이동. |
+| `--screenshot-strokes <N>` | N회 인터랙션 실행(예: 긋기 N획). 생략 가능. |
+| `--screenshot-scroll-bottom` | 씬을 최하단까지 스크롤 후 촬영. 생략 가능. |
+
+또한 simshot은 항상 `-AppleLanguages (lang)`와 `-AppleLocale locale`도 넘겨 앱이 지정 언어로 표시되게 합니다.
+
+### 앱 쪽 구현 예 (SwiftUI)
+
+```swift
+import SwiftUI
+
+struct HomeView: View {
+    @State private var path: [Character] = []
+    @State private var showSettings = false
+
+    var body: some View {
+        NavigationStack(path: $path) {
+            content
+                .onAppear {
+                    #if DEBUG
+                    handleScreenshotScene()
+                    #endif
+                }
+        }
+        .sheet(isPresented: $showSettings) {
+            SettingsView()
+        }
+    }
+
+    #if DEBUG
+    /// 스크린샷 촬영 전용: simshot의 기동 인자를 해석해 해당 화면으로 직행한다.
+    private func handleScreenshotScene() {
+        let args = ProcessInfo.processInfo.arguments
+        guard let index = args.firstIndex(of: "--screenshot-scene"),
+              index + 1 < args.count else { return }
+        let scene = args[index + 1]
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            switch scene {
+            case "detail":
+                if let first = characters.first {
+                    path = [first]
+                }
+            case "settings":
+                showSettings = true
+            default:
+                break // "home"은 초기 화면
+            }
+        }
+    }
+    #endif
+}
+```
+
+핸들러는 `#if DEBUG` 안에 있으므로 릴리스 빌드에 섞이지 않습니다.
+
+## 리사이즈
+
+`--resize`로 App Store 제출용 이미지를 `<output>/<device>/<lang>/`에 출력합니다:
+
+1. 원본 이미지의 가로세로비에서 대응하는 App Store 크기를 선택(먼저 정확한 픽셀 일치를 시도하고, 다음으로 비율 판정 — 같은 비율의 iPad Pro 13"와 iPad 10.2"를 구분하기 위함).
+2. 알파 채널을 흰 배경에 합성해 제거.
+3. 고품질 보간(LANCZOS 상당)으로 리사이즈 후 PNG로 저장.
+
+대응 크기:
+
+| 크기 | 디바이스 |
+|---|---|
+| 1320×2868 | iPhone 16 Pro Max / 17 Pro Max(6.9인치) |
+| 1290×2796 | iPhone 15 Pro Max(6.7인치) |
+| 1242×2688 | iPhone 11 Pro Max(6.5인치) |
+| 2064×2752 | iPad Pro 13인치 |
+| 2048×2732 | iPad Pro 12.9인치 |
+| 2266×1488 | iPad Pro 11인치 |
+| 2160×1620 | iPad 10.2인치 |
+
+대응하는 크기가 없으면(비율이 1% 이상 어긋나면) 경고하고 원본 그대로 둡니다.
+
+## 출력 디렉터리
+
+```
+appstore/
+├── raw/
+│   └── iphone-17-pro-max/
+│       ├── ja/
+│       │   ├── 04_home.png
+│       │   └── 01_trace.png
+│       └── en/
+│           └── 04_home.png
+└── iphone-17-pro-max/            # --resize: App Store 제출용
+    └── ja/
+        └── 04_home.png
+```
+
+## 신뢰성
+
+- **타임아웃**: 모든 외부 명령(xcodebuild / simctl 등)은 `--timeout`을 넘으면 강제 종료. 시뮬레이터 고착에도 CI를 멈추지 않습니다.
+- **리트라이**: `launch` / `install` / `screenshot`은 실패 시 자동 리트라이.
+- **디바이스별 격리**: 실패한 디바이스는 보고 후 스킵하고 매트릭스 전체는 계속 진행합니다.
+- **클린 상태**: 설치 전에 제거. 상태를 남기려면 `--no-clean` / `--keep-running`.
+
+## 개발
+
+```bash
+swift build   # 빌드
+swift test    # 테스트 실행
+swift run simshot shoot --help
+```
+
+## 라이선스
+
+[MIT](LICENSE)

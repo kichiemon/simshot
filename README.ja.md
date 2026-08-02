@@ -1,11 +1,13 @@
-# simcap
+# simshot
+
+**[English](README.md) · [日本語](README.ja.md) · [한국어](README.ko.md)**
 
 iOS シミュレータから **`simctl` だけで** App Store 提出用スクリーンショットを自動撮影する CLI です。**XCUITest 不要**・テストランナー起因のハングなし。
 
-アプリ側は `#if DEBUG` で起動引数プロトコルを解釈する小さなハンドラを実装するだけ。あとは simcap が「ビルド → シミュレータ起動 → ステータスバー上書き → 各シーンへ launch → 撮影 → App Store サイズにリサイズ」までを一手に引き受けます。
+アプリ側は `#if DEBUG` で起動引数プロトコルを解釈する小さなハンドラを実装するだけ。あとは simshot が「ビルド → シミュレータ起動 → ステータスバー上書き → 各シーンへ launch → 撮影 → App Store サイズにリサイズ」までを一手に引き受けます。
 
 ```bash
-simcap shoot --project Kanapp.xcodeproj --scheme Kanapp \
+simshot shoot --project Kanapp.xcodeproj --scheme Kanapp \
   --bundle-id dev.kichiemon.kanapp \
   --devices iphone-17-pro-max,ipad-pro-13 \
   --langs ja,en --shots shots.json --resize
@@ -13,10 +15,10 @@ simcap shoot --project Kanapp.xcodeproj --scheme Kanapp \
 
 ## なぜ fastlane snapshot ではないのか
 
-`fastlane snapshot` は **XCUITest** で UI を操作するため、テストターゲットの保守・壊れやすい要素クエリ・ランナークラッシュと戦うことになります。simcap はモデルを逆転させています。
+`fastlane snapshot` は **XCUITest** で UI を操作するため、テストターゲットの保守・壊れやすい要素クエリ・ランナークラッシュと戦うことになります。simshot はモデルを逆転させています。
 
 - **アプリ自身**が各シーンへ遷移します（公開されている起動引数プロトコルを解釈）。
-- simcap は `simctl`（`bootstatus` / `status_bar` / `launch` / `io screenshot`）を呼ぶだけ。全ステップにハードタイムアウト付きなので絶対にハングしません。
+- simshot は `simctl`（`bootstatus` / `status_bar` / `launch` / `io screenshot`）を呼ぶだけ。全ステップにハードタイムアウト付きなので絶対にハングしません。
 - テストバンドルも `XCUITest` も不要。`#if DEBUG` ハンドラと設定ファイルだけです。
 
 ## 動作の仕組み
@@ -33,21 +35,29 @@ simcap shoot --project Kanapp.xcodeproj --scheme Kanapp \
 
 ## インストール
 
+### エージェントスキルとしてインストール (npx)
+
+```bash
+npx skills add kichiemon/simshot
+```
+
+simshot を再利用可能なエージェントスキルとして導入します（Claude Code / opencode 等のスキル対応エージェント向け）。
+
 ### ソースからビルド
 
 ```bash
 git clone https://github.com/kichiemon/simshot.git
-cd simcap
+cd simshot
 swift build -c release
-# バイナリは .build/release/simcap
-ln -s "$(pwd)/.build/release/simcap" /usr/local/bin/simcap
+# バイナリは .build/release/simshot
+ln -s "$(pwd)/.build/release/simshot" /usr/local/bin/simshot
 ```
 
 ### Homebrew (tap)
 
 ```bash
 brew tap kichiemon/homebrew-tap
-brew install simcap
+brew install simshot
 ```
 
 Formula のひな型は [README.md](README.md#homebrew-tap-recommended) を参照してください。
@@ -58,13 +68,13 @@ Formula のひな型は [README.md](README.md#homebrew-tap-recommended) を参�
 2. 一度ビルドしてシミュレータを確認:
 
    ```bash
-   simcap devices
+   simshot devices
    ```
 
 3. `shots.json` を作成（[`examples/shots.json`](examples/shots.json) 参照）するか `--scenes` を使う:
 
    ```bash
-   simcap shoot --project MyApp.xcodeproj --scheme MyApp \
+   simshot shoot --project MyApp.xcodeproj --scheme MyApp \
      --bundle-id com.example.myapp \
      --devices iphone-17-pro-max,ipad-pro-13 \
      --langs ja,en --scenes home,detail,settings \
@@ -77,12 +87,12 @@ Formula のひな型は [README.md](README.md#homebrew-tap-recommended) を参�
 
 | コマンド | 説明 |
 |---|---|
-| `simcap shoot <options>` | ビルド・起動・撮影・リサイズを一括実行 |
-| `simcap devices` | 利用可能なシミュレータ一覧（名前 + UDID） |
-| `simcap version` | バージョン表示 |
-| `simcap help` | ヘルプ表示 |
+| `simshot shoot <options>` | ビルド・起動・撮影・リサイズを一括実行 |
+| `simshot devices` | 利用可能なシミュレータ一覧（名前 + UDID） |
+| `simshot version` | バージョン表示 |
+| `simshot help` | ヘルプ表示 |
 
-## `simcap shoot` オプション
+## `simshot shoot` オプション
 
 ```
 BUILD
@@ -107,7 +117,7 @@ LOCALIZATION
 OUTPUT
   --output <dir>                   出力ディレクトリ（デフォルト: appstore）
   --resize                         App Store 提出用画像も出力（アルファ除去）
-  --derived-data <dir>             DerivedData パス（デフォルト: ~/.simcap/DerivedData）
+  --derived-data <dir>             DerivedData パス（デフォルト: ~/.simshot/DerivedData）
 
 SIMULATOR
   --timeout <secs>                 外部コマンドのタイムアウト（デフォルト: 300）
@@ -127,8 +137,8 @@ MISC
 `--devices` はデバイス名でも UDID でも指定できます:
 
 ```bash
-simcap shoot ... --devices iphone-17-pro-max,ipad-pro-13
-simcap shoot ... --devices 67DF6727-31BC-4246-9FC0-313A22FB2A6C
+simshot shoot ... --devices iphone-17-pro-max,ipad-pro-13
+simshot shoot ... --devices 67DF6727-31BC-4246-9FC0-313A22FB2A6C
 ```
 
 名前は大文字小文字・ハイフン区切りを無視してマッチします。複数の iOS ランタイムに同名デバイスがある場合は **新しいランタイム** を優先します。出力サブディレクトリは渡した名前（UDID の場合はデバイス名のスラッグ）になります。
@@ -161,7 +171,7 @@ simcap shoot ... --devices 67DF6727-31BC-4246-9FC0-313A22FB2A6C
 
 ## Screenshot scene protocol（シーン起動引数プロトコル）
 
-simcap はアプリを固定の引数セット付きで launch します。**シーン名とその動作はアプリ側の自由** — simcap は素通しするだけです。
+simshot はアプリを固定の引数セット付きで launch します。**シーン名とその動作はアプリ側の自由** — simshot は素通しするだけです。
 
 | 引数 | 意味 |
 |---|---|
@@ -170,7 +180,7 @@ simcap はアプリを固定の引数セット付きで launch します。**シ
 | `--screenshot-strokes <N>` | N 回のインタラクションを実行（例: なぞり N 画）。省略可。 |
 | `--screenshot-scroll-bottom` | シーンを最下部までスクロールしてから撮影。省略可。 |
 
-さらに simcap は常に `-AppleLanguages (lang)` と `-AppleLocale locale` も渡すため、アプリは指定言語で表示されます。
+さらに simshot は常に `-AppleLanguages (lang)` と `-AppleLocale locale` も渡すため、アプリは指定言語で表示されます。
 
 ### アプリ側の実装例（SwiftUI）
 
@@ -196,7 +206,7 @@ struct HomeView: View {
     }
 
     #if DEBUG
-    /// スクリーンショット撮影専用: simcap の起動引数を解釈して該当画面へ直行する。
+    /// スクリーンショット撮影専用: simshot の起動引数を解釈して該当画面へ直行する。
     private func handleScreenshotScene() {
         let args = ProcessInfo.processInfo.arguments
         guard let index = args.firstIndex(of: "--screenshot-scene"),
@@ -271,7 +281,7 @@ appstore/
 ```bash
 swift build   # ビルド
 swift test    # テスト実行
-swift run simcap shoot --help
+swift run simshot shoot --help
 ```
 
 ## ライセンス

@@ -2,9 +2,9 @@ import Foundation
 
 /// The screenshot scene launch-argument protocol.
 ///
-/// simcap launches the app under test with a fixed set of arguments that the
+/// simshot launches the app under test with a fixed set of arguments that the
 /// app (under `#if DEBUG`) interprets to navigate straight to a scene. This is
-/// the public contract between simcap and any app that wants screenshot support:
+/// the public contract between simshot and any app that wants screenshot support:
 ///
 /// ```
 /// --ui-testing

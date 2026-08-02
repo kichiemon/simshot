@@ -29,10 +29,10 @@ public enum XcodeBuild {
         let result = try ProcessRunner.run("/usr/bin/xcodebuild", args, timeout: timeout)
         guard result.status == 0 else {
             let diagnostics = result.stdout + "\n" + result.stderr
-            throw SimcapError.commandFailed("xcodebuild failed:\n\(diagnostics)")
+            throw SimshotError.commandFailed("xcodebuild failed:\n\(diagnostics)")
         }
         guard let app = findApp(derivedDataPath: derivedData) else {
-            throw SimcapError.notFound("Could not find a built .app under \(derivedData)/Build/Products/")
+            throw SimshotError.notFound("Could not find a built .app under \(derivedData)/Build/Products/")
         }
         return app
     }

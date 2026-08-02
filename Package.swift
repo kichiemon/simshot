@@ -2,16 +2,16 @@
 import PackageDescription
 
 let package = Package(
-    name: "simcap",
+    name: "simshot",
     platforms: [
         .macOS(.v13)
     ],
     products: [
-        .executable(name: "simcap", targets: ["simcap"])
+        .executable(name: "simshot", targets: ["simshot"])
     ],
     targets: [
-        .target(name: "SimcapCore"),
-        .executableTarget(name: "simcap", dependencies: ["SimcapCore"]),
-        .testTarget(name: "simcapTests", dependencies: ["SimcapCore"])
+        .target(name: "SimshotCore"),
+        .executableTarget(name: "simshot", dependencies: ["SimshotCore"]),
+        .testTarget(name: "simshotTests", dependencies: ["SimshotCore"])
     ]
 )
