@@ -49,6 +49,21 @@ Every external command runs through a **timeout + retry** wrapper, so a crashed 
 
 ## Install
 
+### Install script (curl, macOS)
+
+One-liner that detects your architecture, downloads the matching prebuilt binary from GitHub Releases, verifies its sha256, and installs it to `/usr/local/bin` (or `~/.local/bin`):
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/kichiemon/simshot/main/install.sh | bash
+```
+
+Customize with `SIMSHOT_VERSION` (release tag) and `SIMSHOT_INSTALL_DIR`:
+
+```bash
+SIMSHOT_VERSION=v0.1.1 SIMSHOT_INSTALL_DIR=~/.local/bin \
+  curl -fsSL https://raw.githubusercontent.com/kichiemon/simshot/main/install.sh | bash
+```
+
 ### Install as an agent skill (npx)
 
 ```bash
@@ -131,6 +146,15 @@ class Simshot < Formula
     bin.install "simshot"
   end
 end
+```
+
+### Mint
+
+[Mint](https://github.com/yonaskolb/Mint) builds and installs simshot from source via the [`Mintfile`](Mintfile) (requires Xcode):
+
+```bash
+brew install mint
+mint install kichiemon/simshot
 ```
 
 ### npm (npmjs.com)
