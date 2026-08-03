@@ -33,6 +33,7 @@ plus `-AppleLanguages (lang)` and `-AppleLocale <locale>`. The app must interpre
 
 ## Documentation
 
+- [Docs site (GitHub Pages)](https://kichiemon.github.io/simshot/)
 - [README (English)](README.md)
 - [README (日本語)](README.ja.md)
 - [README (한국어)](README.ko.md)
