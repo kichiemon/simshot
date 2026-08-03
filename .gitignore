@@ -16,5 +16,10 @@ output/
 # npm package downloaded binaries
 npm/bin/
 
+# VitePress docs
+node_modules/
+docs/.vitepress/cache/
+docs/.vitepress/dist/
+
 # macOS
 .DS_Store

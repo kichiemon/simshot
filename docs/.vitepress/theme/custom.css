@@ -1,0 +1,127 @@
+/* simshot brand: red (#dc2626 family) */
+:root {
+  --vp-c-brand-1: #dc2626;
+  --vp-c-brand-2: #b91c1c;
+  --vp-c-brand-3: #ef4444;
+  --vp-c-brand-soft: rgba(220, 38, 38, 0.16);
+  --vp-home-hero-name-color: transparent;
+  --vp-home-hero-name-background: linear-gradient(120deg, #dc2626 30%, #f97316);
+  --vp-home-hero-name-width: fit-content;
+}
+
+.dark {
+  --vp-c-brand-1: #ef4444;
+  --vp-c-brand-2: #dc2626;
+  --vp-c-brand-3: #f87171;
+  --vp-c-brand-soft: rgba(239, 68, 68, 0.18);
+}
+
+/* ---------- Landing page ---------- */
+
+/* Demo GIF directly under the hero */
+.demo {
+  display: flex;
+  justify-content: center;
+  margin: 2.5rem auto 1rem;
+}
+
+.demo img {
+  width: min(760px, 100%);
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.22);
+  border: 1px solid var(--vp-c-divider);
+}
+
+/* Features grid (6 cards) */
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0 0.5rem;
+}
+
+.feature-card {
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 12px;
+  padding: 1.25rem 1.25rem 1.1rem;
+  background: var(--vp-c-bg-soft);
+  transition: border-color 0.2s, transform 0.2s;
+}
+
+.feature-card:hover {
+  border-color: var(--vp-c-brand-1);
+  transform: translateY(-2px);
+}
+
+.feature-card h3 {
+  margin: 0 0 0.4rem;
+  font-size: 1.05rem;
+}
+
+.feature-card p {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: var(--vp-c-text-2);
+}
+
+/* Install: two code blocks side by side */
+.install-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1rem;
+  margin: 1rem 0 0.5rem;
+}
+
+.install-grid .language-bash {
+  margin: 0;
+}
+
+.install-grid pre {
+  height: 100%;
+}
+
+/* Badges row */
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  margin: 2rem 0 1rem;
+}
+
+.badges a {
+  display: inline-block;
+  padding: 0.3rem 0.8rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border: 1px solid var(--vp-c-divider);
+  color: var(--vp-c-text-1);
+  text-decoration: none;
+  background: var(--vp-c-bg-soft);
+}
+
+.badges a:hover {
+  border-color: var(--vp-c-brand-1);
+  color: var(--vp-c-brand-1);
+}
+
+/* Footer links on the landing page */
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  justify-content: center;
+  margin: 1.5rem 0 0.5rem;
+  font-size: 0.95rem;
+}
+
+.footer-links a {
+  color: var(--vp-c-text-2);
+  text-decoration: none;
+}
+
+.footer-links a:hover {
+  color: var(--vp-c-brand-1);
+}
