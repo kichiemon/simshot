@@ -98,6 +98,7 @@ All eight install paths are documented in the [installation guide](/guide/instal
 <a href="https://github.com/kichiemon/simshot/actions/workflows/ci.yml">![CI](https://img.shields.io/github/actions/workflow/status/kichiemon/simshot/ci.yml?style=flat-square&label=CI)</a>
 <a href="https://github.com/kichiemon/simshot/releases">![Swift](https://img.shields.io/badge/Swift-5.9%2B-F05138?style=flat-square&logo=swift&logoColor=white)</a>
 <a href="https://github.com/kichiemon/simshot">![License](https://img.shields.io/github/license/kichiemon/simshot?style=flat-square&color=blue)</a>
+<a href="https://github.com/kichiemon/simshot/stargazers">![Stars](https://img.shields.io/github/stars/kichiemon/simshot?style=social)</a>
 <a href="https://github.com/kichiemon/simshot/releases/tag/v0.1.1">![Version](https://img.shields.io/badge/version-v0.1.1-dc2626?style=flat-square)</a>
 
 </div>
@@ -105,6 +106,7 @@ All eight install paths are documented in the [installation guide](/guide/instal
 <div class="footer-links">
 
 [GitHub repo](https://github.com/kichiemon/simshot)
+[Discussions](https://github.com/kichiemon/simshot/discussions)
 [Releases](https://github.com/kichiemon/simshot/releases)
 [Install as a skill](https://github.com/kichiemon/simshot)
 [Report an issue](https://github.com/kichiemon/simshot/issues)

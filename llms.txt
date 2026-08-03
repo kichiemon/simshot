@@ -39,6 +39,7 @@ plus `-AppleLanguages (lang)` and `-AppleLocale <locale>`. The app must interpre
 - [README (한국어)](README.ko.md)
 - [Shot config example](examples/shots.json)
 - [Dummy app scene handler](examples/DemoSceneHandler.swift) + [examples README](examples/README.md)
+- [Discussions](https://github.com/kichiemon/simshot/discussions) · [Issues](https://github.com/kichiemon/simshot/issues)
 - [Contributing](CONTRIBUTING.md) · [Security](SECURITY.md) · [Code of Conduct](CODE_OF_CONDUCT.md) · [Changelog](CHANGELOG.md)
 - [MIT License](LICENSE)
 

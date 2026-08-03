@@ -9,6 +9,8 @@
 
 iOS 시뮬레이터에서 **`simctl`만으로** App Store 제출용 스크린샷을 자동 촬영하는 CLI입니다. **XCUITest 불필요** · 테스트 러너 기인 행(hang) 없음.
 
+> ⭐ simshot이 릴리스 작업을 편하게 해줬다면 스타를 주시면 감사하겠습니다. 질문이나 아이디어는 [Discussions](https://github.com/kichiemon/simshot/discussions)로 부탁드립니다.
+
 ![simshot demo](assets/demo.gif)
 
 앱 쪽은 `#if DEBUG`로 기동 인자 프로토콜을 해석하는 작은 핸들러를 구현하기만 하면 됩니다. 이후 simshot이 「빌드 → 시뮬레이터 부팅 → 상태 바 덮어쓰기 → 각 씬으로 launch → 촬영 → App Store 크기로 리사이즈」까지 한 번에 처리합니다.

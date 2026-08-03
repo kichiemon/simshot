@@ -9,6 +9,8 @@
 
 Capture App Store-ready screenshots from the iOS Simulator with **`simctl` only — no XCUITest, no flaky test runners, no hangs.**
 
+> ⭐ If simshot makes your next release easier, consider starring the repo. Questions or ideas? Join the [Discussions](https://github.com/kichiemon/simshot/discussions).
+
 ![simshot demo](assets/demo.gif)
 
 Your app implements a tiny `#if DEBUG` launch-argument handler; simshot does the rest: build, boot simulators, override the status bar, launch each scene, capture, and resize to App Store sizes.
