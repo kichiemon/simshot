@@ -117,7 +117,7 @@ npm i -g simshot
 npx simshot shoot
 ```
 
-macOS(arm64 / x86_64) + Node.js 14+가 필요합니다. `postinstall`에서 GitHub Releases의 해당 아키텍처 프리빌드 단일 바이너리를 다운로드하고 sha256을 검증합니다(구현은 [`npm/`](npm/)). npm 버전은 publish 준비만 되어 있으며, npm 계정 로그인이 필요해 아직 미공개입니다. 공개 전까지는 curl 원라이너·Homebrew·Nix·mise를 이용하세요.
+macOS(arm64 / x86_64) + Node.js 14+가 필요합니다. `postinstall`에서 GitHub Releases의 해당 아키텍처 프리빌드 단일 바이너리를 다운로드하고 sha256을 검증합니다(구현은 [`npm/`](npm/)). npm에는 `simshot`으로 공개되어 있습니다(v0.1.1+).
 
 ## 퀵스타트
 

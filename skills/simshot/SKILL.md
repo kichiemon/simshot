@@ -70,7 +70,7 @@ npm i -g simshot
 npx simshot shoot
 ```
 
-Requires macOS (arm64 / x86_64) + Node.js 14+. The `postinstall` script downloads a prebuilt single binary from GitHub Releases (implementation in `npm/`) and verifies its sha256. The npm package is prepared but not yet published.
+Requires macOS (arm64 / x86_64) + Node.js 14+. The `postinstall` script downloads a prebuilt single binary from GitHub Releases (implementation in `npm/`) and verifies its sha256. The npm package is published as `simshot`.
 
 ### Build from source
 

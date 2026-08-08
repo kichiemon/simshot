@@ -166,7 +166,7 @@ npm i -g simshot
 npx simshot shoot
 ```
 
-Requires Node.js 14+ on macOS (arm64/x86_64). The package downloads the matching prebuilt single binary from GitHub Releases in `postinstall` (see [`npm/`](npm/)) and verifies its sha256. The npm package is prepared but not yet published (publishing requires an npm account) — until then use the curl one-liner, Homebrew, Nix, or mise.
+Requires Node.js 14+ on macOS (arm64/x86_64). The package downloads the matching prebuilt single binary from GitHub Releases in `postinstall` (see [`npm/`](npm/)) and verifies its sha256. Published on npm as `simshot` (v0.1.1+).
 
 ## Quick start
 

@@ -63,7 +63,7 @@ npm i -g simshot
 npx simshot shoot
 ```
 
-Requires Node.js 14+ on macOS. `postinstall` downloads the matching prebuilt single binary and verifies its sha256. The package is prepared but **not yet published** (publishing requires an npm account) — until then use one of the other paths.
+Requires Node.js 14+ on macOS. `postinstall` downloads the matching prebuilt single binary and verifies its sha256. The package is published on npm as `simshot`.
 
 ## 7. Mint
 
