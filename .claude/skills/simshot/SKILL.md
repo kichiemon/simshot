@@ -32,10 +32,10 @@ Skill-aware agents (Claude Code, opencode, etc.) then pick it up automatically. 
 
 ```bash
 # Apple Silicon (arm64)
-curl -sL https://github.com/kichiemon/simshot/releases/download/v0.1.1/simshot-macos-arm64 -o /usr/local/bin/simshot && chmod +x /usr/local/bin/simshot
+curl -sL https://github.com/kichiemon/simshot/releases/download/v0.2.0/simshot-macos-arm64 -o /usr/local/bin/simshot && chmod +x /usr/local/bin/simshot
 
 # Intel (x86_64)
-curl -sL https://github.com/kichiemon/simshot/releases/download/v0.1.1/simshot-macos-x86_64 -o /usr/local/bin/simshot && chmod +x /usr/local/bin/simshot
+curl -sL https://github.com/kichiemon/simshot/releases/download/v0.2.0/simshot-macos-x86_64 -o /usr/local/bin/simshot && chmod +x /usr/local/bin/simshot
 ```
 
 ### Nix
@@ -70,7 +70,7 @@ npm i -g simshot
 npx simshot shoot
 ```
 
-Requires macOS (arm64 / x86_64) + Node.js 14+. The `postinstall` script downloads a prebuilt single binary from GitHub Releases (implementation in `npm/`) and verifies its sha256. The npm package is prepared but not yet published.
+Requires macOS (arm64 / x86_64) + Node.js 14+. The `postinstall` script downloads a prebuilt single binary from GitHub Releases (implementation in `npm/`) and verifies its sha256. The npm package is published as `simshot`.
 
 ### Build from source
 
@@ -96,9 +96,15 @@ simshot shoot --project MyApp.xcodeproj --scheme MyApp \
   --devices iphone-17-pro-max,ipad-pro-13 \
   --langs ja,en --scenes home,detail,settings \
   --output appstore --resize
+
+# 4. Check the captures are publishable (exit 1 on problems)
+simshot verify appstore --devices iphone-17-pro-max,ipad-pro-13 --langs ja,en
 ```
 
-Results are saved to `appstore/<device>/<lang>/NN_name.png`.
+Results are saved to `appstore/<device>/<lang>/NN_name.png`. `simshot verify`
+flags anything App Store Connect would reject — dimensions that aren't an
+accepted size, an alpha channel, mixed sizes in one folder, or a locale that
+never got captured — so run it before uploading (and in CI).
 
 ## simshot.yml configuration
 

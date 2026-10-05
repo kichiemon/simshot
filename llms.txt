@@ -46,7 +46,7 @@ plus `-AppleLanguages (lang)` and `-AppleLocale <locale>`. The app must interpre
 
 ## Install
 
-- Single binary (macOS arm64/x86_64): `curl -sL https://github.com/kichiemon/simshot/releases/download/v0.1.1/simshot-macos-<arm64|x86_64> -o /usr/local/bin/simshot && chmod +x /usr/local/bin/simshot`
+- Single binary (macOS arm64/x86_64): `curl -sL https://github.com/kichiemon/simshot/releases/download/v0.2.0/simshot-macos-<arm64|x86_64> -o /usr/local/bin/simshot && chmod +x /usr/local/bin/simshot`
 - Nix: `nix run github:kichiemon/simshot` / `nix profile install github:kichiemon/simshot` (the repo's `flake.nix` fetches the prebuilt binary from GitHub Releases)
 - mise: `mise use -g github:kichiemon/simshot` — recommended github backend (SLSA-verified); legacy `ubi` backend (`ubi:kichiemon/simshot`) also works but is deprecated in mise 2027.1.0
 - npx (agent skill): `npx skills add kichiemon/simshot` — skill-aware agents then use simshot automatically (skill at `skills/simshot/SKILL.md`); for OpenAI Codex use `npx skills add kichiemon/simshot -a codex` (installs to `.agents/skills/`; the skill is synced across `skills/`, `.claude/skills/`, `.agents/skills/`)
