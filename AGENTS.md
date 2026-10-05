@@ -24,9 +24,10 @@ swift run simshot init --yes # generate a simshot.yml scaffold
   - `DeviceSpec.swift` — App Store size targets and aspect-ratio matching.
   - `Resizer.swift` — alpha flattening + resize via CoreGraphics/ImageIO (no PIL).
   - `Doctor.swift` — environment diagnostics (`simshot doctor`); pure `evaluate` for tests.
+  - `Verifier.swift` — output-tree validation against App Store screenshot rules (`simshot verify`); pure finding logic for tests.
   - `InitConfig.swift` — `simshot init` answer model + commented `simshot.yml` template.
   - `Support.swift` — `SimshotError`, `Log`, version.
-- `Sources/simshot/` — CLI entry point (`CLI.swift`), argument parsing (`Options.swift`), the shoot orchestrator (`ShootRunner.swift`), doctor/init runners (`Doctor.swift`, `InitRunner.swift`), help text (`Help.swift`).
+- `Sources/simshot/` — CLI entry point (`CLI.swift`), argument parsing (`Options.swift`), the shoot orchestrator (`ShootRunner.swift`), doctor/init/verify runners (`Doctor.swift`, `InitRunner.swift`, `VerifyRunner.swift`), help text (`Help.swift`).
 - `Tests/simshotTests/` — XCTest suite.
 - `examples/` — sample shot config (`shots.json`), dummy app protocol handler (`DemoSceneHandler.swift`), and an `examples/README.md` explaining it.
 - `.github/workflows/` — CI (`ci.yml`, includes swift-format lint) and release (`release.yml`) pipelines.

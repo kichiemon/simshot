@@ -212,6 +212,7 @@ Screenshots land in `appstore/<device>/<lang>/NN_name.png`.
 | `simshot devices` | List available simulators (name + UDID). |
 | `simshot doctor` | Diagnose the local Xcode / simulator environment (exit 1 on problems). |
 | `simshot init` | Generate a commented `simshot.yml` config scaffold. |
+| `simshot verify [dir]` | Check captured screenshots against App Store requirements (exit 1 on problems). |
 | `simshot version` | Print the version. |
 | `simshot help` | Show help. |
 
@@ -237,6 +238,30 @@ Generates a commented `simshot.yml` scaffold that documents the options you'd pa
 ```bash
 simshot init --yes   # → simshot.yml (commented template)
 ```
+
+### `simshot verify`
+
+Checks the tree `simshot shoot` produced against Apple's screenshot rules; anything App Store Connect would reject fails here first (exit `1`), so it works as a CI gate.
+
+```bash
+simshot shoot --project MyApp.xcodeproj --scheme MyApp \
+  --bundle-id com.example.myapp --devices iphone-17-pro-max \
+  --langs ja,en --scenes home,detail --resize
+simshot verify appstore --devices iphone-17-pro-max --langs ja,en
+```
+
+```text
+simshot verify — appstore
+
+✅ iphone-17-pro-max/ja  3 files  1290×2796 (6.7inch)
+❌ iphone-17-pro-max/en  2 files  1290×2796 (6.7inch)
+
+❌ iphone-17-pro-max/en/02_detail.png
+   image has an alpha channel — App Store Connect rejects these
+   → run shoot with `--resize` to write flattened App Store copies
+```
+
+It flags dimensions that aren't an accepted size, an alpha channel, mixed sizes inside one folder, and empty or missing device/language folders. `raw/` is skipped, `--devices`/`--langs` require those folders to exist, and `--json` gives the same report for tooling.
 
 ## `simshot shoot` reference
 

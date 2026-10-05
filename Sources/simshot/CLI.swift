@@ -11,6 +11,7 @@ enum Command {
     case devices
     case doctor
     case initConfig(InitOptions)
+    case verify(VerifyOptions)
     case version
     case help(String)
 }
@@ -28,6 +29,7 @@ struct SimshotCLI {
             case "shoot": Log.error(Help.shoot)
             case "init": Log.error(Help.initHelp)
             case "doctor": Log.error(Help.doctor)
+            case "verify": Log.error(Help.verify)
             default: Log.error(Help.main)
             }
             exit(1)
@@ -58,6 +60,12 @@ struct SimshotCLI {
                 return .help(Help.initHelp)
             }
             return .initConfig(try parseInit(rest))
+        case "verify":
+            let rest = Array(args.dropFirst())
+            if rest.contains("--help") || rest.contains("-h") {
+                return .help(Help.verify)
+            }
+            return .verify(try parseVerify(rest))
         case "version", "--version", "-V":
             return .version
         case "help", "--help", "-h":
@@ -77,6 +85,8 @@ struct SimshotCLI {
             try DoctorRunner.run()
         case .initConfig(let options):
             try InitRunner.run(yes: options.yes, output: options.output)
+        case .verify(let options):
+            try VerifyRunner.run(options)
         case .version:
             print("simshot \(simshotVersion)")
         case .help(let text):
@@ -100,6 +110,47 @@ struct SimshotCLI {
                 options.output = args[index]
             default:
                 throw SimshotError.usage("Unknown option '\(raw)'. Run `simshot init --help`.")
+            }
+            index += 1
+        }
+        return options
+    }
+
+    static func parseVerify(_ args: [String]) throws -> VerifyOptions {
+        var options = VerifyOptions()
+        var index = 0
+        while index < args.count {
+            let raw = args[index]
+            guard raw.hasPrefix("-") else {
+                options.root = raw
+                index += 1
+                continue
+            }
+            var flag = raw
+            var inline: String?
+            if let equals = raw.firstIndex(of: "=") {
+                flag = String(raw[raw.startIndex..<equals])
+                inline = String(raw[raw.index(after: equals)...])
+            }
+
+            func value() throws -> String {
+                if let inline { return inline }
+                guard index + 1 < args.count else {
+                    throw SimshotError.usage("Missing value for \(flag)")
+                }
+                index += 1
+                return args[index]
+            }
+
+            switch flag {
+            case "--devices":
+                options.devices = ArgParser.csv(try value())
+            case "--langs":
+                options.languages = ArgParser.csv(try value())
+            case "--json":
+                options.json = true
+            default:
+                throw SimshotError.usage("Unknown option '\(raw)'. Run `simshot verify --help`.")
             }
             index += 1
         }

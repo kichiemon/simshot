@@ -58,6 +58,11 @@ hero:
 </div>
 
 <div class="feature-card">
+<h3>✅ Verifiable output</h3>
+<p><code>simshot verify</code> fails CI when a screenshot has the wrong dimensions, an alpha channel, or a language that never got captured.</p>
+</div>
+
+<div class="feature-card">
 <h3>📦 8 install paths</h3>
 <p>Install script, curl one-liner, Homebrew, Nix, mise, npm, Mint, or build from source. A prebuilt binary ships for macOS arm64 + x86_64.</p>
 </div>

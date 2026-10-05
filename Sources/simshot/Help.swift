@@ -7,6 +7,7 @@ enum Help {
           simshot devices
           simshot doctor
           simshot init [--yes] [--output <path>]
+          simshot verify [dir] [--devices <list>] [--langs <list>] [--json]
           simshot version
           simshot help
 
@@ -15,6 +16,7 @@ enum Help {
           devices     List available simulators (name + UDID).
           doctor      Diagnose the local Xcode / simulator environment (exit 1 if broken).
           init        Generate a commented simshot.yml config scaffold.
+          verify      Check captured screenshots against App Store requirements (exit 1 on problems).
           version     Print the version.
           help        Show this help.
 
@@ -41,6 +43,43 @@ enum Help {
           --yes, -y          Use default placeholder values without prompting.
           --output <path>    Output file (default: simshot.yml)
           --help, -h         Show this help.
+        """
+
+    static let verify = """
+        simshot verify — check captured screenshots against App Store requirements
+
+        Walks an output tree produced by `simshot shoot` and reports anything that
+        App Store Connect would reject or ignore:
+
+        - dimensions that are not an accepted App Store screenshot size
+        - an alpha channel (rejected at upload)
+        - mixed sizes inside one device/language folder
+        - empty or missing device/language folders
+
+        `raw/` (the untouched simctl captures) is skipped: verify inspects the
+        App Store copies, so run shoot with `--resize` first.
+
+        USAGE:
+          simshot verify [dir] [options]
+
+        ARGUMENTS:
+          dir                Output directory to inspect (default: appstore)
+
+        OPTIONS:
+          --devices <list>   Require these device folders (default: whatever exists on disk)
+          --langs <list>     Require these language folders (default: whatever exists on disk)
+          --json             Print a machine-readable JSON report
+          --help, -h         Show this help.
+
+        EXIT CODES:
+          0  every checked screenshot is App Store-ready
+          1  at least one problem was found (details on stderr)
+
+        EXAMPLE:
+          simshot shoot --project MyApp.xcodeproj --scheme MyApp \\
+            --bundle-id com.example.myapp --devices iphone-17-pro-max \\
+            --langs ja,en --scenes home,detail --resize
+          simshot verify appstore --devices iphone-17-pro-max --langs ja,en
         """
 
     static let shoot = """

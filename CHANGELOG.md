@@ -5,6 +5,18 @@ All notable changes to simshot are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- `simshot verify [dir]` — check an output tree against App Store screenshot
+  requirements and exit `1` on any problem, so a bad capture fails CI instead of
+  failing review at upload. Flags dimensions that aren't an accepted size, an
+  alpha channel, mixed sizes inside one device/language folder, and empty or
+  missing folders. `raw/` is skipped; `--devices`/`--langs` require those folders
+  to exist; `--json` prints a machine-readable report. All logic lives in
+  `Verifier` (SimshotCore) with `VerifierTests` covering each finding.
+
 ## [0.1.1] - 2026-08-02
 
 ### Added

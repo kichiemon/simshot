@@ -187,6 +187,7 @@ macOS（arm64 / x86_64）+ Node.js 14+ が必要です。`postinstall` で GitHu
 | `simshot devices` | 利用可能なシミュレータ一覧（名前 + UDID） |
 | `simshot doctor` | ローカルの Xcode / シミュレータ環境を診断（問題があれば exit 1） |
 | `simshot init` | コメント付き `simshot.yml` の雛形を生成 |
+| `simshot verify [dir]` | 撮影結果が App Store の要件を満たすか検証（問題があれば exit 1） |
 | `simshot version` | バージョン表示 |
 | `simshot help` | ヘルプ表示 |
 
@@ -212,6 +213,23 @@ $ simshot doctor
 ```bash
 simshot init --yes   # → simshot.yml（コメント付きテンプレート）
 ```
+
+### `simshot verify`
+
+`simshot shoot` が出力したツリーを Apple のスクリーンショット規定に照らして検証します。App Store Connect に弾かれる要素はここで先に落ちる（exit `1`）ので、CI のゲートとして使えます。
+
+```text
+simshot verify — appstore
+
+✅ iphone-17-pro-max/ja  3 files  1290×2796 (6.7inch)
+❌ iphone-17-pro-max/en  2 files  1290×2796 (6.7inch)
+
+❌ iphone-17-pro-max/en/02_detail.png
+   image has an alpha channel — App Store Connect rejects these
+   → run shoot with `--resize` to write flattened App Store copies
+```
+
+許容サイズ外の寸法、アルファチャンネル、同一フォルダ内の寸法混在、空・欠落したデバイス／言語フォルダを検出します。`raw/` は対象外、`--devices` / `--langs` はそのフォルダの存在を要求、`--json` で機械可読なレポートを出力します。
 
 ## `simshot shoot` オプション
 

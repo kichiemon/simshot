@@ -187,6 +187,7 @@ macOS(arm64 / x86_64) + Node.js 14+가 필요합니다. `postinstall`에서 GitH
 | `simshot devices` | 사용 가능한 시뮬레이터 목록(이름 + UDID) |
 | `simshot doctor` | 로컬 Xcode / 시뮬레이터 환경 진단(문제 시 exit 1) |
 | `simshot init` | 주석 포함 `simshot.yml` 스캐폴드 생성 |
+| `simshot verify [dir]` | 촬영 결과가 App Store 요구사항을 충족하는지 검증(문제 시 exit 1) |
 | `simshot version` | 버전 표시 |
 | `simshot help` | 도움말 표시 |
 
@@ -212,6 +213,23 @@ $ simshot doctor
 ```bash
 simshot init --yes   # → simshot.yml(주석 포함 템플릿)
 ```
+
+### `simshot verify`
+
+`simshot shoot`이 만든 트리를 Apple의 스크린샷 규정에 비추어 검증합니다. App Store Connect에서 거부될 요소가 먼저 여기서 걸리므로(exit `1`) CI 게이트로 쓸 수 있습니다.
+
+```text
+simshot verify — appstore
+
+✅ iphone-17-pro-max/ja  3 files  1290×2796 (6.7inch)
+❌ iphone-17-pro-max/en  2 files  1290×2796 (6.7inch)
+
+❌ iphone-17-pro-max/en/02_detail.png
+   image has an alpha channel — App Store Connect rejects these
+   → run shoot with `--resize` to write flattened App Store copies
+```
+
+허용 크기가 아닌 해상도, 알파 채널, 같은 폴더 안의 크기 혼재, 비어 있거나 빠진 기기/언어 폴더를 찾아냅니다. `raw/`는 건너뛰고, `--devices`/`--langs`는 해당 폴더의 존재를 요구하며, `--json`으로 기계 판독용 리포트를 출력합니다.
 
 ## `simshot shoot` 옵션
 
