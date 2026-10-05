@@ -51,6 +51,20 @@ Every external command runs through a **timeout + retry** wrapper, so a crashed 
 
 ## Install
 
+Eight ways to get `simshot` — pick one:
+
+| # | Path | Command | Needs |
+|---|---|---|---|
+| 1 | Install script (curl) | `curl -fsSL …/install.sh \| bash` | macOS |
+| 2 | Homebrew (tap) | `brew tap kichiemon/homebrew-tap && brew install simshot` | Homebrew |
+| 3 | Single binary (curl) | download `simshot-macos-{arm64,x86_64}` | macOS |
+| 4 | Nix | `nix profile install github:kichiemon/simshot` | Nix |
+| 5 | mise | `mise use -g github:kichiemon/simshot` | mise |
+| 6 | npm | `npm i -g simshot` | Node.js 14+ |
+| 7 | Mint | `mint install kichiemon/simshot` | Xcode |
+| 8 | Build from source | `swift build -c release` | Xcode |
+| + | Agent skill | `npx skills add kichiemon/simshot` | npx |
+
 ### Install script (curl, macOS)
 
 One-liner that detects your architecture, downloads the matching prebuilt binary from GitHub Releases, verifies its sha256, and installs it to `/usr/local/bin` (or `~/.local/bin`):

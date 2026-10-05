@@ -51,6 +51,35 @@ simshot shoot --project Kanapp.xcodeproj --scheme Kanapp \
 
 ## インストール
 
+`simshot` の導入手順は 8 通り。好きなものを 1 つ選べば OK です:
+
+| # | 方法 | コマンド | 必要なもの |
+|---|---|---|---|
+| 1 | インストールスクリプト (curl) | `curl -fsSL …/install.sh \| bash` | macOS |
+| 2 | Homebrew (tap) | `brew tap kichiemon/homebrew-tap && brew install simshot` | Homebrew |
+| 3 | 単体バイナリ (curl) | `simshot-macos-{arm64,x86_64}` をダウンロード | macOS |
+| 4 | Nix | `nix profile install github:kichiemon/simshot` | Nix |
+| 5 | mise | `mise use -g github:kichiemon/simshot` | mise |
+| 6 | npm | `npm i -g simshot` | Node.js 14+ |
+| 7 | Mint | `mint install kichiemon/simshot` | Xcode |
+| 8 | ソースからビルド | `swift build -c release` | Xcode |
+| + | エージェントスキル | `npx skills add kichiemon/simshot` | npx |
+
+### インストールスクリプト (curl, macOS)
+
+アーキテクチャを自動判定し、GitHub Releases から対応するプリビルドバイナリを取得、sha256 を検証して `/usr/local/bin`（または `~/.local/bin`）へインストールするワンライナー:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/kichiemon/simshot/main/install.sh | bash
+```
+
+`SIMSHOT_VERSION`（リリースタグ）と `SIMSHOT_INSTALL_DIR` でカスタマイズできます:
+
+```bash
+SIMSHOT_VERSION=v0.1.1 SIMSHOT_INSTALL_DIR=~/.local/bin \
+  curl -fsSL https://raw.githubusercontent.com/kichiemon/simshot/main/install.sh | bash
+```
+
 ### エージェントスキルとしてインストール (npx)
 
 ```bash
@@ -109,6 +138,15 @@ brew install simshot
 ```
 
 リリース済みバイナリをインストールする Formula は [`kichiemon/homebrew-tap`](https://github.com/kichiemon/homebrew-tap)（`Formula/simshot.rb`）にあります。
+
+### Mint
+
+[Mint](https://github.com/yonaskolb/Mint) は [`Mintfile`](Mintfile) 経由でソースからビルドしてインストールします（Xcode が必要）:
+
+```bash
+brew install mint
+mint install kichiemon/simshot
+```
 
 ### npm（npmjs.com）
 
