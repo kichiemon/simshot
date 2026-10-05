@@ -182,14 +182,53 @@ public enum ArgParser {
             throw SimshotError.notFound("Cannot read shots config: \(path)")
         }
         let decoder = JSONDecoder()
-        if let file = try? decoder.decode(ShotsFile.self, from: data) {
-            return file.shots
+        // Pick the form from the top-level JSON shape instead of guessing, so a
+        // failure inside a `{ "shots": [...] }` file names the path the user
+        // actually wrote (`shots[1].scene`, not `[1].scene`).
+        let isObject = (try? JSONSerialization.jsonObject(with: data)) is [String: Any]
+        do {
+            if isObject {
+                return try decoder.decode(ShotsFile.self, from: data).shots
+            }
+            return try decoder.decode([Shot].self, from: data)
+        } catch let error as DecodingError {
+            throw SimshotError.invalid("Invalid shots config \(path): \(describe(error))")
+        } catch {
+            throw SimshotError.invalid("Invalid shots config \(path): \(error.localizedDescription)")
         }
-        if let shots = try? decoder.decode([Shot].self, from: data) {
-            return shots
+    }
+
+    /// Explain a `DecodingError` in one line, naming the JSON path of the
+    /// offending value: "shots[1] is missing required key 'scene'".
+    static func describe(_ error: DecodingError) -> String {
+        // Render a coding path as `shots[1].wait`, dropping the `shots` key so
+        // the array form and the `{ "shots": [...] }` form read the same.
+        func render(_ codingPath: [CodingKey]) -> String {
+            var path = ""
+            for key in codingPath where key.stringValue != "shots" {
+                if let index = key.intValue {
+                    path += "[\(index)]"
+                } else {
+                    path += path.isEmpty ? key.stringValue : ".\(key.stringValue)"
+                }
+            }
+            if path.isEmpty { return "shots" }
+            return path.hasPrefix("[") ? "shots\(path)" : "shots.\(path)"
         }
-        throw SimshotError.invalid(
-            "shots config must be a JSON array of shots or { \"shots\": [...] }. See README."
-        )
+
+        switch error {
+        case .keyNotFound(_, let context) where context.codingPath.isEmpty:
+            return "missing the required top-level \"shots\" array"
+        case .keyNotFound(let key, let context):
+            return "\(render(context.codingPath)) is missing required key '\(key.stringValue)'"
+        case .typeMismatch(_, let context):
+            return "\(render(context.codingPath)) has the wrong type (\(context.debugDescription))"
+        case .valueNotFound(_, let context):
+            return "\(render(context.codingPath)) must not be null (\(context.debugDescription))"
+        case .dataCorrupted(let context):
+            return context.debugDescription
+        @unknown default:
+            return error.localizedDescription
+        }
     }
 }

@@ -244,6 +244,84 @@ final class ArgParserTests: XCTestCase {
         }
     }
 
+    // MARK: - Shots config diagnostics
+
+    func testShotsConfigMissingFieldNamesPathAndKey() throws {
+        let config = try writeTempShots(
+            """
+            { "shots": [
+                { "name": "01_home.png", "scene": "home" },
+                { "name": "02_detail.png" }
+            ] }
+            """)
+        let message = try invalidShotsMessage(config)
+        XCTAssertTrue(message.contains("shots[1]"), message)
+        XCTAssertTrue(message.contains("'scene'"), message)
+    }
+
+    func testShotsConfigWrongValueTypeNamesPath() throws {
+        let config = try writeTempShots(
+            """
+            { "shots": [ { "name": "01_home.png", "scene": "home", "wait": "six" } ] }
+            """)
+        let message = try invalidShotsMessage(config)
+        XCTAssertTrue(message.contains("shots[0].wait"), message)
+    }
+
+    func testShotsArrayFormMissingFieldNamesPath() throws {
+        let config = try writeTempShots("[ { \"name\": \"01_home.png\" } ]")
+        let message = try invalidShotsMessage(config)
+        XCTAssertTrue(message.contains("shots[0]"), message)
+        XCTAssertTrue(message.contains("'scene'"), message)
+    }
+
+    func testShotsConfigMissingTopLevelShotsArray() throws {
+        let config = try writeTempShots("{ \"scenes\": [] }")
+        let message = try invalidShotsMessage(config)
+        XCTAssertTrue(message.contains("\"shots\""), message)
+    }
+
+    func testShotsConfigMessageIncludesFilePath() throws {
+        let config = try writeTempShots("{ \"shots\": [ { \"scene\": \"home\" } ] }")
+        let message = try invalidShotsMessage(config)
+        XCTAssertTrue(message.contains(config.path), message)
+    }
+
+    func testShotsArrayFormParses() throws {
+        let config = try writeTempShots("[ { \"name\": \"01_home.png\", \"scene\": \"home\", \"wait\": 9 } ]")
+        let options = try ArgParser.parseShoot([
+            "--project", "MyApp.xcodeproj",
+            "--scheme", "MyApp",
+            "--bundle-id", "com.example.myapp",
+            "--devices", "iphone-17-pro-max",
+            "--shots", config.path,
+        ])
+        XCTAssertEqual(options.shots.count, 1)
+        XCTAssertEqual(options.shots[0].name, "01_home.png")
+        XCTAssertEqual(options.shots[0].wait, 9)
+    }
+
+    private func invalidShotsMessage(_ config: URL, file: StaticString = #filePath, line: UInt = #line) throws
+        -> String
+    {
+        var captured: String?
+        XCTAssertThrowsError(
+            try ArgParser.parseShoot([
+                "--project", "MyApp.xcodeproj",
+                "--scheme", "MyApp",
+                "--bundle-id", "com.example.myapp",
+                "--devices", "iphone-17-pro-max",
+                "--shots", config.path,
+            ]), file: file, line: line
+        ) { error in
+            guard case SimshotError.invalid(let message) = error else {
+                return XCTFail("expected .invalid, got \(error)", file: file, line: line)
+            }
+            captured = message
+        }
+        return try XCTUnwrap(captured, file: file, line: line)
+    }
+
     private func assertUsage(
         _ args: [String],
         contains needle: String,
