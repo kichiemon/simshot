@@ -17,7 +17,7 @@ simshot captures App Store-ready screenshots from the iOS Simulator by driving `
 - `simshot verify` checks an output tree against App Store screenshot requirements (exact accepted dimensions, no alpha channel, no mixed sizes, no empty folders); `raw/` is skipped, `--json` for machine output, exit 1 when a problem is found.
 - `simshot shoot` flags: `--project`/`--workspace`/`--scheme`, `--app-path`, `--bundle-id`, `--devices`, `--langs`, `--locales`, `--shots <config.json>`, `--scenes`, `--wait`, `--output`, `--resize`, `--derived-data`, `--timeout`, `--status-bar-time`, `--status-bar-battery`, `--no-ui-testing`, `--no-clean`, `--keep-running`, `--verbose`.
 - Output layout: `appstore/raw/<device>/<lang>/NN_name.png` (raw) and `appstore/<device>/<lang>/NN_name.png` (App Store-ready when `--resize`).
-- App Store size targets: 1320×2868, 1290×2796, 1242×2688 (iPhone), 2064×2752, 2048×2732, 2266×1488, 2160×1620 (iPad); alpha is flattened to white; resizing is LANCZOS-equivalent via CoreGraphics/ImageIO.
+- App Store size targets come from Apple's published list: 1320×2868 / 1290×2796 / 1260×2736 / 1284×2778 / 1242×2688 / 1206×2622 / 1179×2556 / 1170×2532 / 1125×2436 / 1080×2340 / 1242×2208 / 750×1334 (iPhone) and 2064×2752 / 2048×2732 / 1668×2420 / 1668×2388 / 2266×1488 / 1640×2360 / 1668×2224 / 1536×2048 / 768×1024 (iPad); alpha is flattened to white; resizing is LANCZOS-equivalent via CoreGraphics/ImageIO. A capture already on an accepted size keeps its resolution.
 
 ## Screenshot scene protocol (public contract)
 

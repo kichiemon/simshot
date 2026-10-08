@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- The App Store size table now matches Apple's published list. Two things were
+  wrong before. `verify` rejected sizes App Store Connect accepts — an iPad Air
+  10.9-inch capture (1640×2360, and its 11-inch siblings 1668×2420 and
+  1668×2388), an iPhone 17 at 1179×2556, an iPhone SE at 750×1334 — and asked
+  for a resize that was never needed. It also accepted 2160×1620, which is the
+  iPad 10.2-inch screen resolution rather than an upload size, so a file App
+  Store Connect rejects passed the gate. `--resize` no longer upscales: a
+  capture that is already an accepted size keeps its resolution and only gets
+  its alpha flattened, and a raw 10.2-inch iPad capture is resized to the
+  required iPad 13-inch size.
 - A shots config that is valid JSON but has a bad field now fails with the
   offending path and reason, e.g. `shots[1] is missing required key 'scene'` or
   `shots[0].wait has the wrong type`, plus the config path. Previously any

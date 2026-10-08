@@ -78,20 +78,36 @@ Names are matched case-insensitively and hyphen/dash-insensitively. When the sam
 
 `--resize` writes App Store-ready copies to `<output>/<device>/<lang>/`. simshot:
 
-1. Detects the raw capture's aspect ratio and picks the matching App Store size (exact dimension match first).
+1. Matches the raw capture against Apple's published screenshot sizes — exact dimensions first, then aspect ratio within 1%. A capture that is already an accepted size keeps its own resolution instead of being upscaled.
 2. Flattens any alpha channel onto white.
 3. Resizes with high-quality interpolation (LANCZOS-equivalent) and writes PNG.
 
-Supported targets:
+Sizes accepted for current devices, in either orientation (`verify` also accepts Apple's older sizes, down to the 3.5-inch iPhone):
 
 | Size | Device |
 |---|---|
 | 1320×2868 | iPhone 16 Pro Max / 17 Pro Max (6.9") |
-| 1290×2796 | iPhone 15 Pro Max (6.7") |
-| 1242×2688 | iPhone 11 Pro Max (6.5") |
+| 1290×2796 | iPhone 14 Pro Max / 15 Plus / 16 Plus (6.7") |
+| 1260×2736 | iPhone Air (6.5") |
+| 1284×2778 | iPhone 12 Pro Max / 13 Pro Max |
+| 1242×2688 | iPhone 11 Pro Max / XS Max (6.5") |
+| 1206×2622 | iPhone 16 Pro / 17 Pro (6.3") |
+| 1179×2556 | iPhone 15 / 16 / 17 (6.1") |
+| 1170×2532 | iPhone 12 / 13 / 14 |
+| 1125×2436 | iPhone X / XS / 11 Pro |
+| 1080×2340 | iPhone 12 mini |
+| 1242×2208 | iPhone 6 Plus / 8 Plus |
+| 750×1334 | iPhone 8 / SE (2nd, 3rd gen) |
 | 2064×2752 | iPad Pro 13-inch |
 | 2048×2732 | iPad Pro 12.9-inch |
-| 2266×1488 | iPad Pro 11-inch |
-| 2160×1620 | iPad 10.2-inch |
+| 1668×2420 | iPad Pro 11-inch (M4, M5) |
+| 1668×2388 | iPad Pro 11-inch (2018-2022) |
+| 2266×1488 | iPad mini (6th gen, A17 Pro) |
+| 1640×2360 | iPad Air 11-inch / iPad (10th gen, A16) |
+| 1668×2224 | iPad Pro 10.5-inch / iPad (9th gen) |
+| 1536×2048 | iPad 9.7-inch |
+| 768×1024 | iPad mini |
+
+A 10.2-inch iPad screen captures at 2160×1620, which App Store Connect does not accept (that display class submits at 1668×2224), so the raw capture is resized to the iPad 13-inch size rather than passed through.
 
 If no target matches (within 1% aspect ratio), simshot warns and keeps the raw capture.

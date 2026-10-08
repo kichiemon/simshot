@@ -3,13 +3,28 @@ import XCTest
 @testable import SimshotCore
 
 final class DeviceSpecTests: XCTestCase {
-    func testMatchTargetiPhoneProMaxSizes() {
+    func testMatchTargetiPhoneSizes() {
         // iPhone 17 Pro Max / 16 Pro Max (6.9")
         XCTAssertEqual(DeviceSpec.matchTarget(width: 1320, height: 2868)?.name, "6.9inch")
         // iPhone 15 Pro Max (6.7")
         XCTAssertEqual(DeviceSpec.matchTarget(width: 1290, height: 2796)?.name, "6.7inch")
+        // iPhone Air (6.5")
+        XCTAssertEqual(DeviceSpec.matchTarget(width: 1260, height: 2736)?.name, "iphone-air")
         // iPhone 11 Pro Max (6.5")
         XCTAssertEqual(DeviceSpec.matchTarget(width: 1242, height: 2688)?.name, "6.5inch")
+        // iPhone 13 Pro Max (6.7")
+        XCTAssertEqual(DeviceSpec.matchTarget(width: 1284, height: 2778)?.name, "iphone-13-pro-max")
+    }
+
+    func testMatchTargetKeepsCurrentIPhoneNativeSizes() {
+        // A native capture that Apple already accepts is a target in its own
+        // right, so `--resize` has no reason to upscale it.
+        XCTAssertEqual(DeviceSpec.matchTarget(width: 1206, height: 2622)?.name, "6.3inch")
+        XCTAssertEqual(DeviceSpec.matchTarget(width: 1179, height: 2556)?.name, "6.1inch")
+        XCTAssertEqual(DeviceSpec.matchTarget(width: 1170, height: 2532)?.name, "iphone-14")
+        XCTAssertEqual(DeviceSpec.matchTarget(width: 1125, height: 2436)?.name, "iphone-x")
+        XCTAssertEqual(DeviceSpec.matchTarget(width: 1242, height: 2208)?.name, "iphone-8-plus")
+        XCTAssertEqual(DeviceSpec.matchTarget(width: 750, height: 1334)?.name, "iphone-8")
     }
 
     func testMatchTargetiPad() {
@@ -18,9 +33,40 @@ final class DeviceSpecTests: XCTestCase {
         XCTAssertEqual(target?.name, "ipad-pro-13")
         XCTAssertEqual(target?.size.width, 2064)
         XCTAssertEqual(target?.size.height, 2752)
-        // iPad 10.2-inch, both portrait and landscape
-        XCTAssertEqual(DeviceSpec.matchTarget(width: 1620, height: 2160)?.name, "ipad-10-2")
-        XCTAssertEqual(DeviceSpec.matchTarget(width: 2160, height: 1620)?.name, "ipad-10-2")
+        // iPad Pro 12.9-inch
+        XCTAssertEqual(DeviceSpec.matchTarget(width: 2048, height: 2732)?.name, "ipad-pro-12-9")
+    }
+
+    func testMatchTargetCoversEveryCurrentIPad11InchSize() {
+        // The 11-inch display class has four accepted sizes, and Apple reports
+        // them in portrait, so the portrait order must work too.
+        XCTAssertEqual(DeviceSpec.matchTarget(width: 1668, height: 2420)?.name, "ipad-11")
+        XCTAssertEqual(DeviceSpec.matchTarget(width: 1668, height: 2388)?.name, "ipad-11")
+        XCTAssertEqual(DeviceSpec.matchTarget(width: 1488, height: 2266)?.name, "ipad-11")
+        XCTAssertEqual(DeviceSpec.matchTarget(width: 2266, height: 1488)?.name, "ipad-11")
+        XCTAssertEqual(DeviceSpec.matchTarget(width: 1640, height: 2360)?.name, "ipad-11")
+        XCTAssertEqual(DeviceSpec.matchTarget(width: 1668, height: 2224)?.name, "ipad-10-5")
+    }
+
+    func testIPad102NativeSizeMapsToTheRequiredIPadSize() {
+        // 2160×1620 is the iPad 10.2-inch screen resolution. App Store Connect
+        // does not accept it (that display class uploads at 1668×2224), so a raw
+        // capture falls through to the 4:3 ratio match and lands on the required
+        // 13-inch size instead of being passed through untouched.
+        let target = DeviceSpec.matchTarget(width: 2160, height: 1620)
+        XCTAssertEqual(target?.name, "ipad-pro-13")
+        XCTAssertEqual(target?.size, CGSize(width: 2752, height: 2064))
+    }
+
+    func testEveryAcceptedSizeMatchesItself() {
+        // `verify` treats a nil match as "App Store Connect would reject this",
+        // so every size in the table has to match itself exactly.
+        for target in DeviceSpec.appStoreTargets {
+            let matched = DeviceSpec.matchTarget(width: Int(target.size.width), height: Int(target.size.height))
+            XCTAssertNotNil(
+                matched, "\(target.name) \(Int(target.size.width))×\(Int(target.size.height)) did not match")
+            XCTAssertEqual(matched?.size, target.size, "\(target.name) matched a different size")
+        }
     }
 
     func testMatchTargetReturnsNilForOddRatio() {

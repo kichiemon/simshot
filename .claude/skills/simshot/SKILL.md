@@ -280,7 +280,7 @@ appstore/
         └── 04_home.png
 ```
 
-`--resize` picks an App Store size from the raw image's aspect ratio, flattens alpha onto white, resizes with LANCZOS-equivalent interpolation, and saves as PNG. Supported sizes: iPhone 1320×2868 / 1290×2796 / 1242×2688, iPad 2064×2752 / 2048×2732 / 2266×1488 / 2160×1620. If the aspect ratio deviates by more than 1%, a warning is printed and the raw image is kept as-is.
+`--resize` matches the raw capture against Apple's published screenshot sizes — exact dimensions first, then aspect ratio within 1% — flattens alpha onto white, resizes with LANCZOS-equivalent interpolation, and saves as PNG. Sizes accepted for current devices, either orientation: iPhone 1320×2868 / 1290×2796 / 1260×2736 / 1284×2778 / 1242×2688 / 1206×2622 / 1179×2556 / 1170×2532 / 1125×2436 / 1080×2340 / 1242×2208 / 750×1334, iPad 2064×2752 / 2048×2732 / 1668×2420 / 1668×2388 / 2266×1488 / 1640×2360 / 1668×2224 / 1536×2048 / 768×1024. A capture that is already an accepted size keeps its resolution (no upscaling); 2160×1620 is the iPad 10.2-inch screen, not an upload size, so it is resized to the iPad 13-inch size. If the aspect ratio deviates by more than 1%, a warning is printed and the raw image is kept as-is.
 
 ## Troubleshooting
 

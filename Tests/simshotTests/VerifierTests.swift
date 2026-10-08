@@ -94,16 +94,53 @@ final class VerifierTests: XCTestCase {
 
     func testNearMissSizeIsReportedAsWrongSize() throws {
         let folder = try makeFolder("iphone-17-pro-max", "en")
-        // Same aspect ratio as 1290×2796 (6.7"), but the wrong pixel dimensions.
-        try writePNG(width: 1284, height: 2778, alpha: false, named: "01_home.png", in: folder)
+        // 1280×2760 is two pixels off 1284×2778 (the same 6.7" display class), a
+        // shape App Store Connect rejects.
+        try writePNG(width: 1280, height: 2760, alpha: false, named: "01_home.png", in: folder)
 
         let report = Verifier.verify(root: root)
 
         XCTAssertEqual(kinds(report), [.wrongSize])
         // The hint names the closest accepted size; what matters is that the
         // reported dimensions are the ones actually on disk.
-        XCTAssertTrue(report.issues[0].message.contains("but got 1284×2778"), report.issues[0].message)
+        XCTAssertTrue(report.issues[0].message.contains("but got 1280×2760"), report.issues[0].message)
         XCTAssertTrue(report.issues[0].fix.contains("--resize"))
+    }
+
+    func testNativeSizesAppleAcceptsPass() throws {
+        // These are native simulator captures, not resized output. Apple accepts
+        // every one of them, so verify must not ask for a resize.
+        for (device, size) in [
+            ("iphone-17", CGSize(width: 1179, height: 2556)),
+            ("iphone-17-pro", CGSize(width: 1206, height: 2622)),
+            ("ipad-air-11", CGSize(width: 1640, height: 2360)),
+            ("ipad-pro-11", CGSize(width: 1668, height: 2388)),
+            ("ipad-pro-11-m4", CGSize(width: 1668, height: 2420)),
+            ("ipad-9th", CGSize(width: 1536, height: 2048)),
+            ("iphone-se", CGSize(width: 750, height: 1334)),
+        ] {
+            let folder = try makeFolder(device, "en")
+            try writePNG(
+                width: Int(size.width), height: Int(size.height), alpha: false, named: "01_home.png", in: folder)
+        }
+
+        let report = Verifier.verify(root: root)
+
+        XCTAssertTrue(report.ok, "unexpected issues: \(report.issues)")
+        XCTAssertEqual(report.checkedFiles, 7)
+    }
+
+    func testIPad102NativeSizeIsReported() throws {
+        // 2160×1620 is the iPad 10.2-inch screen resolution. App Store Connect
+        // uploads that display class at 1668×2224, so the raw capture is not
+        // publishable as-is.
+        let folder = try makeFolder("ipad-10-2", "en")
+        try writePNG(width: 2160, height: 1620, alpha: false, named: "01_home.png", in: folder)
+
+        let report = Verifier.verify(root: root)
+
+        XCTAssertEqual(kinds(report), [.wrongSize])
+        XCTAssertTrue(report.issues[0].message.contains("but got 2160×1620"), report.issues[0].message)
     }
 
     func testNonScreenshotAspectIsReported() throws {
