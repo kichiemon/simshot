@@ -18,11 +18,11 @@
       assets = {
         aarch64-darwin = {
           name = "simshot-macos-arm64";
-          sha256 = "9585de2a75ce66971e9fec304475873cf3d4d25f981f4c274bff3a272e81b99a";
+          sha256 = "3135afa8876deeceed9952054a8fd3d4f20cb21ee8a4ed36761ec9dddd797f42";
         };
         x86_64-darwin = {
           name = "simshot-macos-x86_64";
-          sha256 = "5273399e9b2dce73341ee18e772091d928f6565f085c6d8e4ad4e0a6bbf13f03";
+          sha256 = "bb811078be1359af157b326049a15179143afc7c16017b267a675d8c788a23b5";
         };
       };
 
