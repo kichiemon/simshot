@@ -248,13 +248,15 @@ Checks `xcode-select` / Xcode / `simctl` / iOS runtimes / available simulators a
 ```
 $ simshot doctor
 ✅ xcode-select: /Applications/Xcode.app/Contents/Developer
-✅ Xcode: Xcode 26.5
+✅ Xcode: Xcode 27.0
 ✅ simctl: found
 ✅ iOS runtimes: 7 installed
 ✅ Available simulators: 36 available
 
 ✅ All checks passed.
 ```
+
+Works on Xcode 27 (Device Hub) too: simshot drives `xcrun simctl` only and never opens `Simulator.app`.
 
 ### `simshot init`
 

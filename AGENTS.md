@@ -42,7 +42,7 @@ swift run simshot init --yes # generate a simshot.yml scaffold
 - The screenshot scene protocol (`--screenshot-scene`, `--screenshot-strokes`, `--screenshot-scroll-bottom`, `--ui-testing`) is a public contract — changing it must be reflected in `README.md`, `README.ja.md`, `README.ko.md`, and `Sources/SimshotCore/ShotSpec.swift`.
 - All external commands must go through `ProcessRunner` with a timeout.
 - Add tests for new pure logic (argument building, target matching, config decoding, image processing).
-- **`docs/` is the public VitePress site.** `docs.yml` builds and deploys every `.md` under it to GitHub Pages, so anything placed there is world-readable at `https://kichiemon.github.io/simshot/<path>`. Internal working notes (marketing plans, launch strategy, account details) belong in the private `kichiemon/simshot-marketing` repo, not here.
+- **`docs/` is the public VitePress site.** `docs.yml` builds and deploys every `.md` under it to GitHub Pages, so anything placed there is world-readable at `https://kichiemon.github.io/simshot/<path>`. Internal working notes (marketing plans, launch strategy, account details) belong in a separate private repo, not here.
 
 ## Verification
 

@@ -6,6 +6,18 @@
 - **iOS runtimes fails**: Add an iOS runtime in Xcode > Settings > Platforms.
 - **Available simulators warns**: Create a device with `xcrun simctl create` or in Xcode > Window > Devices and Simulators.
 
+## Xcode 27 (Device Hub)
+
+Xcode 27 replaces the Simulator app with **Device Hub**. simshot is unaffected: it
+drives `xcrun simctl` only and never launches `Simulator.app`, so `doctor`,
+`devices`, and `shoot` keep working. If `doctor` reports `simctl` as broken after
+an Xcode upgrade, point the developer directory at the new Xcode and re-run it:
+
+```bash
+sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+simshot doctor
+```
+
 ## `simshot shoot` errors
 
 ### "Unknown device"

@@ -13,6 +13,7 @@ simshot captures App Store-ready screenshots from the iOS Simulator by driving `
 - Binary/product name: `simshot`; core library module: `SimshotCore`; test target: `simshotTests`.
 - Commands: `simshot shoot`, `simshot devices`, `simshot doctor`, `simshot init [--yes] [--output <path>]`, `simshot verify [dir] [--devices <list>] [--langs <list>] [--json]`, `simshot version`, `simshot help`.
 - `simshot doctor` checks xcode-select / Xcode / simctl / iOS runtimes / available simulators and exits 1 if a check fails.
+- Works with Xcode 27 (Device Hub): simshot drives `xcrun simctl` only and never opens `Simulator.app`, so Device Hub replacing the Simulator app does not affect it.
 - `simshot init` writes a commented `simshot.yml` scaffold (interactive, or non-interactive with `--yes`).
 - `simshot verify` checks an output tree against App Store screenshot requirements (exact accepted dimensions, no alpha channel, no mixed sizes, no empty folders); `raw/` is skipped, `--json` for machine output, exit 1 when a problem is found.
 - `simshot shoot` flags: `--project`/`--workspace`/`--scheme`, `--app-path`, `--bundle-id`, `--devices`, `--langs`, `--locales`, `--shots <config.json>`, `--scenes`, `--wait`, `--output`, `--resize`, `--derived-data`, `--timeout`, `--status-bar-time`, `--status-bar-battery`, `--no-ui-testing`, `--no-clean`, `--keep-running`, `--verbose`.

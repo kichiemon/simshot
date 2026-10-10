@@ -16,8 +16,8 @@ iOS 시뮬레이터에서 **`simctl`만으로** App Store 제출용 스크린샷
 앱 쪽은 `#if DEBUG`로 기동 인자 프로토콜을 해석하는 작은 핸들러를 구현하기만 하면 됩니다. 이후 simshot이 「빌드 → 시뮬레이터 부팅 → 상태 바 덮어쓰기 → 각 씬으로 launch → 촬영 → App Store 크기로 리사이즈」까지 한 번에 처리합니다.
 
 ```bash
-simshot shoot --project Kanapp.xcodeproj --scheme Kanapp \
-  --bundle-id dev.kichiemon.kanapp \
+simshot shoot --project MyApp.xcodeproj --scheme MyApp \
+  --bundle-id com.example.myapp \
   --devices iphone-17-pro-max,ipad-pro-13 \
   --langs ja,en --shots shots.json --resize
 ```
@@ -36,6 +36,9 @@ simshot shoot --project Kanapp.xcodeproj --scheme Kanapp \
 | App Store 크기 리사이즈 | **내장**(`--resize`) | 별도 도구 |
 | 다국어 | `--langs ja,en` | 로케일별 설정 |
 | 의존성 | **0개** | gem 다수 |
+
+> **Xcode 27 / Device Hub 지원:** simshot은 `xcrun simctl`만 사용하고 `Simulator.app`을 열지 않으므로, Simulator.app을 대체한 Device Hub(Xcode 27)에서도 그대로 동작합니다.
+
 
 ## 동작 원리
 
@@ -198,7 +201,7 @@ macOS(arm64 / x86_64) + Node.js 14+가 필요합니다. `postinstall`에서 GitH
 ```text
 $ simshot doctor
 ✅ xcode-select: /Applications/Xcode.app/Contents/Developer
-✅ Xcode: Xcode 26.5
+✅ Xcode: Xcode 27.0
 ✅ simctl: found
 ✅ iOS runtimes: 7 installed
 ✅ Available simulators: 36 available

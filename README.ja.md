@@ -16,8 +16,8 @@ iOS シミュレータから **`simctl` だけで** App Store 提出用スクリ
 アプリ側は `#if DEBUG` で起動引数プロトコルを解釈する小さなハンドラを実装するだけ。あとは simshot が「ビルド → シミュレータ起動 → ステータスバー上書き → 各シーンへ launch → 撮影 → App Store サイズにリサイズ」までを一手に引き受けます。
 
 ```bash
-simshot shoot --project Kanapp.xcodeproj --scheme Kanapp \
-  --bundle-id dev.kichiemon.kanapp \
+simshot shoot --project MyApp.xcodeproj --scheme MyApp \
+  --bundle-id com.example.myapp \
   --devices iphone-17-pro-max,ipad-pro-13 \
   --langs ja,en --shots shots.json --resize
 ```
@@ -36,6 +36,9 @@ simshot shoot --project Kanapp.xcodeproj --scheme Kanapp \
 | App Store サイズへのリサイズ | **内蔵**（`--resize`） | 別ツール |
 | 多言語 | `--langs ja,en` | ロケールごとの設定 |
 | 依存の大きさ | **ゼロ** | gem 多数 |
+
+> **Xcode 27 / Device Hub 対応:** simshot は `xcrun simctl` しか使わず `Simulator.app` を開かないため、Simulator.app を置き換えた Device Hub（Xcode 27）でもそのまま動作します。
+
 
 ## 動作の仕組み
 
@@ -198,7 +201,7 @@ macOS（arm64 / x86_64）+ Node.js 14+ が必要です。`postinstall` で GitHu
 ```text
 $ simshot doctor
 ✅ xcode-select: /Applications/Xcode.app/Contents/Developer
-✅ Xcode: Xcode 26.5
+✅ Xcode: Xcode 27.0
 ✅ simctl: found
 ✅ iOS runtimes: 7 installed
 ✅ Available simulators: 36 available

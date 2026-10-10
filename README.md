@@ -16,8 +16,8 @@ Capture App Store-ready screenshots from the iOS Simulator with **`simctl` only 
 Your app implements a tiny `#if DEBUG` launch-argument handler; simshot does the rest: build, boot simulators, override the status bar, launch each scene, capture, and resize to App Store sizes.
 
 ```bash
-simshot shoot --project Kanapp.xcodeproj --scheme Kanapp \
-  --bundle-id dev.kichiemon.kanapp \
+simshot shoot --project MyApp.xcodeproj --scheme MyApp \
+  --bundle-id com.example.myapp \
   --devices iphone-17-pro-max,ipad-pro-13 \
   --langs ja,en --shots shots.json --resize
 ```
@@ -36,6 +36,9 @@ simshot shoot --project Kanapp.xcodeproj --scheme Kanapp \
 | Resize to App Store sizes | **Built in** (`--resize`) | Separate tooling |
 | Multi-language | `--langs ja,en` | Per-locale setup |
 | Dependency footprint | **Zero** | Dozens of gems |
+
+> **Xcode 27 / Device Hub:** simshot drives `xcrun simctl` only and never opens `Simulator.app`, so it keeps working on Xcode 27, where Device Hub replaces the Simulator app.
+
 
 ## How it works
 
@@ -232,7 +235,7 @@ Checks `xcode-select`, Xcode, `simctl`, iOS runtimes, and available simulators, 
 ```text
 $ simshot doctor
 ✅ xcode-select: /Applications/Xcode.app/Contents/Developer
-✅ Xcode: Xcode 26.5
+✅ Xcode: Xcode 27.0
 ✅ simctl: found
 ✅ iOS runtimes: 7 installed
 ✅ Available simulators: 36 available

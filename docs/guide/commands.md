@@ -57,7 +57,7 @@ Checks `xcode-select`, Xcode, `simctl`, iOS runtimes, and available simulators, 
 ```text
 $ simshot doctor
 ✅ xcode-select: /Applications/Xcode.app/Contents/Developer
-✅ Xcode: Xcode 26.5
+✅ Xcode: Xcode 27.0
 ✅ simctl: found
 ✅ iOS runtimes: 7 installed
 ✅ Available simulators: 36 available

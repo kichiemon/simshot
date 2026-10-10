@@ -96,7 +96,7 @@ enum Help {
           --app-path <path.app>          Skip building; use an existing .app bundle
 
         REQUIRED:
-          --bundle-id <id>               App bundle identifier (e.g. dev.kichiemon.kanapp)
+          --bundle-id <id>               App bundle identifier (e.g. com.example.myapp)
           --devices <list>               Comma-separated simulator names or UDIDs
                                          (e.g. iphone-17-pro-max,ipad-pro-13)
 
@@ -127,8 +127,8 @@ enum Help {
           --help, -h                     Show this help
 
         EXAMPLE:
-          simshot shoot --project Kanapp.xcodeproj --scheme Kanapp \\
-            --bundle-id dev.kichiemon.kanapp \\
+          simshot shoot --project MyApp.xcodeproj --scheme MyApp \\
+            --bundle-id com.example.myapp \\
             --devices iphone-17-pro-max,ipad-pro-13 \\
             --langs ja,en --shots shots.json --resize
 
