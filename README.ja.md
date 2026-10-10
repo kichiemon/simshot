@@ -155,7 +155,7 @@ npm i -g simshot
 npx simshot shoot
 ```
 
-macOS（arm64 / x86_64）+ Node.js 14+ が必要です。`postinstall` で GitHub Releases から対応アーキテクチャのプリビルド単体バイナリをダウンロードし、sha256 を検証します（実装は [`npm/`](npm/)）。npm では `simshot` として公開済みですが、レジストリは v0.1.1 のままで `simshot verify` は含まれません。
+macOS（arm64 / x86_64）+ Node.js 14+ が必要です。`postinstall` で GitHub Releases から対応アーキテクチャのプリビルド単体バイナリをダウンロードし、sha256 を検証します（実装は [`npm/`](npm/)）。npm では `simshot` として公開済みです（v0.2.1）。
 
 ## クイックスタート
 
