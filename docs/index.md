@@ -91,7 +91,7 @@ brew install simshot
 
 ```bash
 # Single binary (curl)
-curl -sL https://github.com/kichiemon/simshot/releases/download/v0.2.0/simshot-macos-arm64 -o /usr/local/bin/simshot && chmod +x /usr/local/bin/simshot
+curl -sL https://github.com/kichiemon/simshot/releases/download/v0.2.1/simshot-macos-arm64 -o /usr/local/bin/simshot && chmod +x /usr/local/bin/simshot
 ```
 
 </div>
@@ -104,7 +104,7 @@ All eight install paths are documented in the [installation guide](/guide/instal
 <a href="https://github.com/kichiemon/simshot/releases">![Swift](https://img.shields.io/badge/Swift-5.9%2B-F05138?style=flat-square&logo=swift&logoColor=white)</a>
 <a href="https://github.com/kichiemon/simshot">![License](https://img.shields.io/github/license/kichiemon/simshot?style=flat-square&color=blue)</a>
 <a href="https://github.com/kichiemon/simshot/stargazers">![Stars](https://img.shields.io/github/stars/kichiemon/simshot?style=social)</a>
-<a href="https://github.com/kichiemon/simshot/releases/tag/v0.2.0">![Version](https://img.shields.io/badge/version-v0.2.0-dc2626?style=flat-square)</a>
+<a href="https://github.com/kichiemon/simshot/releases/tag/v0.2.1">![Version](https://img.shields.io/badge/version-v0.2.1-dc2626?style=flat-square)</a>
 
 </div>
 

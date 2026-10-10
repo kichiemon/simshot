@@ -76,7 +76,7 @@ curl -fsSL https://raw.githubusercontent.com/kichiemon/simshot/main/install.sh |
 `SIMSHOT_VERSION`(릴리스 태그)과 `SIMSHOT_INSTALL_DIR`로 바꿀 수 있습니다:
 
 ```bash
-SIMSHOT_VERSION=v0.2.0 SIMSHOT_INSTALL_DIR=~/.local/bin \
+SIMSHOT_VERSION=v0.2.1 SIMSHOT_INSTALL_DIR=~/.local/bin \
   curl -fsSL https://raw.githubusercontent.com/kichiemon/simshot/main/install.sh | bash
 ```
 
@@ -104,10 +104,10 @@ GitHub Releases에서 해당 아키텍처의 프리빌드 바이너리를 직접
 
 ```bash
 # Apple Silicon (arm64)
-curl -sL https://github.com/kichiemon/simshot/releases/download/v0.2.0/simshot-macos-arm64 -o /usr/local/bin/simshot && chmod +x /usr/local/bin/simshot
+curl -sL https://github.com/kichiemon/simshot/releases/download/v0.2.1/simshot-macos-arm64 -o /usr/local/bin/simshot && chmod +x /usr/local/bin/simshot
 
 # Intel (x86_64)
-curl -sL https://github.com/kichiemon/simshot/releases/download/v0.2.0/simshot-macos-x86_64 -o /usr/local/bin/simshot && chmod +x /usr/local/bin/simshot
+curl -sL https://github.com/kichiemon/simshot/releases/download/v0.2.1/simshot-macos-x86_64 -o /usr/local/bin/simshot && chmod +x /usr/local/bin/simshot
 ```
 
 ### Nix
@@ -125,7 +125,7 @@ nix profile install github:kichiemon/simshot   # 프로필에 설치
 
 ```bash
 mise use -g github:kichiemon/simshot   # 전역 설정에 설치
-simshot --version                      # v0.2.0
+simshot --version                      # v0.2.1
 ```
 
 기존 `ubi` backend(`mise use ubi:kichiemon/simshot`)도 같은 `simshot-macos-{os}-{arch}` 에셋을 해석하여 동작하지만, mise에서 deprecated이며 mise 2027.1.0에서 제거될 예정입니다.

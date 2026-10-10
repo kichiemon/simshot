@@ -13,7 +13,7 @@ curl -fsSL https://raw.githubusercontent.com/kichiemon/simshot/main/install.sh |
 Customize with environment variables:
 
 ```bash
-SIMSHOT_VERSION=v0.2.0                      # release tag (default: latest)
+SIMSHOT_VERSION=v0.2.1                      # release tag (default: latest)
 SIMSHOT_INSTALL_DIR=~/.local/bin            # install dir (default: auto)
 ```
 
@@ -23,10 +23,10 @@ Grab the prebuilt binary directly from GitHub Releases — no Swift toolchain re
 
 ```bash
 # Apple Silicon (arm64)
-curl -sL https://github.com/kichiemon/simshot/releases/download/v0.2.0/simshot-macos-arm64 -o /usr/local/bin/simshot && chmod +x /usr/local/bin/simshot
+curl -sL https://github.com/kichiemon/simshot/releases/download/v0.2.1/simshot-macos-arm64 -o /usr/local/bin/simshot && chmod +x /usr/local/bin/simshot
 
 # Intel (x86_64)
-curl -sL https://github.com/kichiemon/simshot/releases/download/v0.2.0/simshot-macos-x86_64 -o /usr/local/bin/simshot && chmod +x /usr/local/bin/simshot
+curl -sL https://github.com/kichiemon/simshot/releases/download/v0.2.1/simshot-macos-x86_64 -o /usr/local/bin/simshot && chmod +x /usr/local/bin/simshot
 ```
 
 ## 3. Homebrew (tap)

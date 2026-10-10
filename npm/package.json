@@ -1,6 +1,6 @@
 {
   "name": "simshot",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "App Store screenshot capture CLI (simctl only, no XCUITest)",
   "bin": {
     "simshot": "cli.js"

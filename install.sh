@@ -7,7 +7,7 @@
 #   curl -fsSL https://raw.githubusercontent.com/kichiemon/simshot/main/install.sh | bash
 #
 # Environment:
-#   SIMSHOT_VERSION        Release tag to install (default: latest, e.g. v0.2.0)
+#   SIMSHOT_VERSION        Release tag to install (default: latest, e.g. v0.2.1)
 #   SIMSHOT_INSTALL_DIR    Install directory (default: /usr/local/bin if
 #                          writable, otherwise ~/.local/bin)
 #

@@ -14,7 +14,7 @@
 
       # Prebuilt single binaries published to GitHub Releases.
       # `name` follows ubi's {project}-{os}-{arch} convention; sha256 is the
-      # digest of the raw (extensionless) binary from the v0.2.0 release.
+      # digest of the raw (extensionless) binary from the v0.2.1 release.
       assets = {
         aarch64-darwin = {
           name = "simshot-macos-arm64";
@@ -38,7 +38,7 @@
         rec {
           simshot = pkgs.stdenv.mkDerivation {
             pname = "simshot";
-            version = "0.2.0";
+            version = "0.2.1";
 
             src = pkgs.fetchurl {
               url = "https://github.com/kichiemon/simshot/releases/download/v${version}/${asset.name}";
