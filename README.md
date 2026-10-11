@@ -5,6 +5,7 @@
 ![CI](https://img.shields.io/github/actions/workflow/status/kichiemon/simshot/ci.yml?style=flat-square&label=CI)
 ![Swift](https://img.shields.io/badge/Swift-5.9%2B-F05138?style=flat-square&logo=swift&logoColor=white)
 ![License](https://img.shields.io/github/license/kichiemon/simshot?style=flat-square&color=blue)
+[![Swift Package Index](https://img.shields.io/badge/Swift_Package_Index-listed-F05138?logo=swift&logoColor=white&style=flat-square)](https://swiftpackageindex.com/kichiemon/simshot)
 ![Stars](https://img.shields.io/github/stars/kichiemon/simshot?style=social)
 
 Capture App Store-ready screenshots from the iOS Simulator with **`simctl` only — no XCUITest, no flaky test runners, no hangs.**

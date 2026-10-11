@@ -5,6 +5,7 @@
 ![CI](https://img.shields.io/github/actions/workflow/status/kichiemon/simshot/ci.yml?style=flat-square&label=CI)
 ![Swift](https://img.shields.io/badge/Swift-5.9%2B-F05138?style=flat-square&logo=swift&logoColor=white)
 ![License](https://img.shields.io/github/license/kichiemon/simshot?style=flat-square&color=blue)
+[![Swift Package Index](https://img.shields.io/badge/Swift_Package_Index-listed-F05138?logo=swift&logoColor=white&style=flat-square)](https://swiftpackageindex.com/kichiemon/simshot)
 ![Stars](https://img.shields.io/github/stars/kichiemon/simshot?style=social)
 
 iOS 시뮬레이터에서 **`simctl`만으로** App Store 제출용 스크린샷을 자동 촬영하는 CLI입니다. **XCUITest 불필요** · 테스트 러너 기인 행(hang) 없음.
