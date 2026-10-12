@@ -55,6 +55,8 @@ enum Help {
         - an alpha channel (rejected at upload)
         - mixed sizes inside one device/language folder
         - empty or missing device/language folders
+        - a tree with nothing to inspect (no device folders, a `raw/`-only tree,
+          or a device folder with no language folders)
 
         `raw/` (the untouched simctl captures) is skipped: verify inspects the
         App Store copies, so run shoot with `--resize` first.

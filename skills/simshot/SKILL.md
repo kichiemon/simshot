@@ -103,8 +103,9 @@ simshot verify appstore --devices iphone-17-pro-max,ipad-pro-13 --langs ja,en
 
 Results are saved to `appstore/<device>/<lang>/NN_name.png`. `simshot verify`
 flags anything App Store Connect would reject — dimensions that aren't an
-accepted size, an alpha channel, mixed sizes in one folder, or a locale that
-never got captured — so run it before uploading (and in CI).
+accepted size, an alpha channel, mixed sizes in one folder, a locale that
+never got captured, or a run that produced nothing to check at all — so run it
+before uploading (and in CI).
 
 ## simshot.yml configuration
 

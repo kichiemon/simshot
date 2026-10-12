@@ -5,6 +5,21 @@ All notable changes to simshot are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- `simshot verify` no longer passes an output tree that holds nothing to check.
+  An empty output directory, a `raw/`-only tree (a `shoot` run without
+  `--resize`), and a device folder with no language folders inside it all used
+  to print `✅ 0 screenshots in 0 folders are App Store-ready.` and exit `0`, so
+  a CI gate went green on a tree with no publishable screenshot in it. Each now
+  reports the empty directory and exits `1`. With `--devices`, a folder that
+  exists but contains no language folder fails the same way instead of passing.
+- The `verify` text report no longer prints stray blank lines around the folder
+  list, and its failure summary now lands after the report instead of above it
+  when stdout is piped (CI logs, `simshot verify > log`).
+
 ## [0.2.1] - 2026-10-10
 
 ### Fixed

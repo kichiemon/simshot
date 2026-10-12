@@ -26,6 +26,12 @@ final class VerifierTests: XCTestCase {
         return folder
     }
 
+    private func makeDeviceFolder(_ device: String) throws -> URL {
+        let folder = root.appendingPathComponent(device)
+        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        return folder
+    }
+
     private func writePNG(
         width: Int,
         height: Int,
@@ -206,6 +212,64 @@ final class VerifierTests: XCTestCase {
 
         XCTAssertEqual(kinds(report), [.missingDirectory])
         XCTAssertEqual(report.folders.count, 0)
+    }
+
+    func testRootWithoutDeviceFoldersIsReported() throws {
+        // An empty output directory must not verify green: checking zero files
+        // is not the same as every file being publishable, and CI reads exit 0
+        // as "the screenshots are fine".
+        let report = Verifier.verify(root: root)
+
+        XCTAssertEqual(kinds(report), [.emptyDirectory])
+        XCTAssertEqual(report.checkedFiles, 0)
+        XCTAssertFalse(report.ok)
+        XCTAssertTrue(report.issues[0].message.contains("no device folders to inspect"), report.issues[0].message)
+    }
+
+    func testRootWithOnlyRawIsReported() throws {
+        // A shoot run without `--resize` leaves only raw/ behind; verify must
+        // say there is nothing to publish rather than pass.
+        let raw = try makeFolder("raw", "ja")
+        try writePNG(width: 1206, height: 2622, alpha: true, named: "01_home.png", in: raw)
+
+        let report = Verifier.verify(root: root)
+
+        XCTAssertEqual(kinds(report), [.emptyDirectory])
+        XCTAssertEqual(report.skipped, ["raw"])
+        XCTAssertTrue(report.issues[0].message.contains("only raw/ is present"), report.issues[0].message)
+    }
+
+    func testDeviceFolderWithoutLanguageFoldersIsReported() throws {
+        _ = try makeDeviceFolder("iphone-17-pro-max")
+
+        let report = Verifier.verify(root: root)
+
+        XCTAssertEqual(kinds(report), [.emptyDirectory])
+        XCTAssertEqual(report.issues[0].path, "iphone-17-pro-max")
+        XCTAssertEqual(report.folders.count, 0)
+        XCTAssertFalse(report.ok)
+    }
+
+    func testRequestedDeviceWithoutLanguageFoldersIsReported() throws {
+        // `--devices` is a promise that this folder holds screenshots, so an
+        // existing folder with nothing inside it cannot pass.
+        _ = try makeDeviceFolder("iphone-17-pro-max")
+
+        let report = Verifier.verify(root: root, devices: ["iphone-17-pro-max"])
+
+        XCTAssertEqual(kinds(report), [.emptyDirectory])
+        XCTAssertFalse(report.ok)
+    }
+
+    func testRequestedLanguagesStillReportEachMissingFolder() throws {
+        // With `--langs` the language list is explicit, so an empty device
+        // folder reports one missing folder per language instead.
+        _ = try makeDeviceFolder("iphone-17-pro-max")
+
+        let report = Verifier.verify(root: root, devices: ["iphone-17-pro-max"], languages: ["ja", "en"])
+
+        XCTAssertEqual(kinds(report), [.missingDirectory, .missingDirectory])
+        XCTAssertEqual(report.issues.map(\.path), ["iphone-17-pro-max/ja", "iphone-17-pro-max/en"])
     }
 
     // MARK: - raw/ handling

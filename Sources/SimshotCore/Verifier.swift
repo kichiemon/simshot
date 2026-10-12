@@ -108,6 +108,20 @@ public enum Verifier {
             deviceNames = dirs.sorted()
         }
 
+        // A root with nothing to walk would otherwise report success over zero
+        // files, which is the worst outcome for a CI gate: a green verify on an
+        // empty directory reads as "screenshots are fine".
+        if deviceNames.isEmpty {
+            let detail = skipped.isEmpty ? "" : " (only \(skipped.joined(separator: ", "))/ is present)"
+            issues.append(
+                VerifyIssue(
+                    kind: .emptyDirectory,
+                    path: root.path,
+                    message: "no device folders to inspect\(detail)",
+                    fix: "run `simshot shoot --resize` to write App Store copies, then verify again"
+                ))
+        }
+
         for device in deviceNames {
             let deviceDir = root.appendingPathComponent(device)
             guard fm.fileExists(atPath: deviceDir.path, isDirectory: &isDirectory), isDirectory.boolValue
@@ -133,6 +147,20 @@ public enum Verifier {
                 }.sorted()
             } else {
                 languageNames = languages
+            }
+
+            // Same false-green shape one level down: a device folder the user
+            // asked for exists, so nothing is reported, yet no language folder
+            // is ever walked.
+            guard !languageNames.isEmpty else {
+                issues.append(
+                    VerifyIssue(
+                        kind: .emptyDirectory,
+                        path: "\(device)",
+                        message: "no language folders in this device folder",
+                        fix: "check the language codes, then re-run shoot for this device"
+                    ))
+                continue
             }
 
             for language in languageNames {

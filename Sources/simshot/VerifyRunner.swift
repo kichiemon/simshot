@@ -34,42 +34,37 @@ enum VerifyRunner {
 
     /// The whole report goes to stdout as one block, so piped output keeps its
     /// order; the failure summary goes to stderr so CI logs and `$?` both see it.
+    ///
+    /// The report is built as sections joined by one blank line, so an empty
+    /// section (no folders, or no issues) leaves no stray blank lines behind.
     static func printTextReport(_ report: VerifyReport) {
-        var lines: [String] = ["simshot verify — \(report.root)", ""]
+        var sections: [[String]] = [["simshot verify — \(report.root)"]]
 
-        for folder in report.folders {
-            let bad = report.issues.contains { $0.path == folder.path || $0.path.hasPrefix(folder.path + "/") }
-            var line = "\(bad ? "❌" : "✅") \(folder.path)  \(folder.fileCount) file\(folder.fileCount == 1 ? "" : "s")"
-            if let size = folder.size {
-                line += "  \(Int(size.width))×\(Int(size.height))"
-            }
-            if let target = folder.target {
-                line += " (\(target.name))"
-            }
-            lines.append(line)
+        if !report.folders.isEmpty {
+            sections.append(report.folders.map { folderLine($0, issues: report.issues) })
         }
 
         if !report.issues.isEmpty {
-            lines.append("")
-            for issue in report.issues {
-                lines.append("❌ \(issue.path)")
-                lines.append("   \(issue.message)")
-                lines.append("   → \(issue.fix)")
-            }
+            sections.append(
+                report.issues.flatMap { ["❌ \($0.path)", "   \($0.message)", "   → \($0.fix)"] })
         }
 
-        lines.append("")
+        var summary: [String] = []
         if report.ok {
-            lines.append(
+            summary.append(
                 "✅ \(report.checkedFiles) screenshot\(report.checkedFiles == 1 ? "" : "s") in "
                     + "\(report.folders.count) folder\(report.folders.count == 1 ? "" : "s") are App Store-ready.")
         }
         if !report.skipped.isEmpty {
-            lines.append(
+            summary.append(
                 "note: skipped \(report.skipped.joined(separator: ", ")) "
                     + "(run shoot with `--resize` for App Store copies)")
         }
-        Log.info(lines.joined(separator: "\n"))
+        if !summary.isEmpty {
+            sections.append(summary)
+        }
+
+        Log.info(sections.map { $0.joined(separator: "\n") }.joined(separator: "\n\n"))
 
         if !report.ok {
             Log.error(
@@ -77,6 +72,20 @@ enum VerifyRunner {
                     + "\(report.folders.count) folder\(report.folders.count == 1 ? "" : "s") "
                     + "(\(report.checkedFiles) file\(report.checkedFiles == 1 ? "" : "s") checked)")
         }
+    }
+
+    /// One `✅`/`❌` line per device/language folder, marked bad when an issue
+    /// points at the folder itself or at a file inside it.
+    private static func folderLine(_ folder: VerifiedFolder, issues: [VerifyIssue]) -> String {
+        let bad = issues.contains { $0.path == folder.path || $0.path.hasPrefix(folder.path + "/") }
+        var line = "\(bad ? "❌" : "✅") \(folder.path)  \(folder.fileCount) file\(folder.fileCount == 1 ? "" : "s")"
+        if let size = folder.size {
+            line += "  \(Int(size.width))×\(Int(size.height))"
+        }
+        if let target = folder.target {
+            line += " (\(target.name))"
+        }
+        return line
     }
 
     static func jsonReport(_ report: VerifyReport) throws -> String {

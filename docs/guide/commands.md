@@ -86,6 +86,9 @@ would reject or ignore, so a bad capture fails CI instead of failing review.
 - an alpha channel (rejected at upload)
 - mixed sizes inside one device/language folder
 - empty or missing device/language folders
+- nothing to inspect at all: no device folders, a `raw/`-only tree (a `shoot`
+  run without `--resize`), or a device folder with no language folders. Checking
+  zero files must not read as success in CI, so these exit `1` too.
 
 `raw/` (the untouched `simctl` captures) is skipped — `verify` inspects the App
 Store copies, so run `shoot` with `--resize` first.

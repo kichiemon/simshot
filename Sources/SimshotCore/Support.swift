@@ -63,6 +63,12 @@ public enum Log {
     }
 
     private static func write(_ message: String, to handle: FileHandle) {
+        // stdout is block-buffered when piped (CI, `simshot ... > log`), so an
+        // error printed straight to stderr would otherwise land above the
+        // progress lines it belongs after. Flush stdout first to keep order.
+        if handle === FileHandle.standardError {
+            fflush(stdout)
+        }
         if let data = (message + "\n").data(using: .utf8) {
             handle.write(data)
         }
