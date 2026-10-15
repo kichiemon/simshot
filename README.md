@@ -306,7 +306,7 @@ OUTPUT
 SIMULATOR
   --timeout <secs>                 Timeout for external commands (default: 300)
   --status-bar-time <t>            Status bar clock (default: 9:41)
-  --status-bar-battery <n>         Status bar battery % (default: 100)
+  --status-bar-battery <n>         Status bar battery %, 0-100 (default: 100)
   --no-ui-testing                  Do not pass --ui-testing to the app
   --no-clean                       Do not uninstall before installing
   --keep-running                   Do not shut down simulators afterwards

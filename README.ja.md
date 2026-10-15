@@ -265,7 +265,7 @@ OUTPUT
 SIMULATOR
   --timeout <secs>                 外部コマンドのタイムアウト（デフォルト: 300）
   --status-bar-time <t>            ステータスバーの時計（デフォルト: 9:41）
-  --status-bar-battery <n>         ステータスバーのバッテリー%（デフォルト: 100）
+  --status-bar-battery <n>         ステータスバーのバッテリー%（0-100、デフォルト: 100）
   --no-ui-testing                  --ui-testing を渡さない
   --no-clean                       インストール前にアンインストールしない
   --keep-running                   撮影後にシミュレータをシャットダウンしない

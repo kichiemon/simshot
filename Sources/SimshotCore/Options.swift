@@ -123,8 +123,22 @@ public enum ArgParser {
         return options
     }
 
-    /// Fill defaults and reject incomplete option sets.
+    /// Fill defaults and reject incomplete or nonsensical option sets.
     static func validate(_ options: inout ShootOptions) throws {
+        // Range checks happen here, at parse time, not downstream. A `--timeout 0`
+        // otherwise parses fine and ProcessRunner kills xcodebuild instantly with
+        // a misleading "timed out" error; a bad battery value only fails after a
+        // full build and simulator boot, where simctl rejects it.
+        guard options.timeout > 0 else {
+            throw SimshotError.usage("--timeout must be a positive number of seconds (got \(options.timeout)).")
+        }
+        guard options.wait >= 0 else {
+            throw SimshotError.usage("--wait must not be negative (got \(options.wait)).")
+        }
+        guard (0...100).contains(options.statusBarBattery) else {
+            throw SimshotError.usage(
+                "--status-bar-battery must be between 0 and 100 (got \(options.statusBarBattery)).")
+        }
         if options.appPath == nil {
             guard options.project != nil || options.workspace != nil else {
                 throw SimshotError.usage("Either --project/--workspace or --app-path is required.")

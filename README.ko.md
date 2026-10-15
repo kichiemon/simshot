@@ -265,7 +265,7 @@ OUTPUT
 SIMULATOR
   --timeout <secs>                 외부 명령 타임아웃(기본: 300)
   --status-bar-time <t>            상태 바 시계(기본: 9:41)
-  --status-bar-battery <n>         상태 바 배터리%(기본: 100)
+  --status-bar-battery <n>         상태 바 배터리%(0-100, 기본: 100)
   --no-ui-testing                  --ui-testing을 넘기지 않음
   --no-clean                       설치 전에 제거하지 않음
   --keep-running                   촬영 후 시뮬레이터를 종료하지 않음

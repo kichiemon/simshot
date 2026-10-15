@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- `simshot shoot` now rejects nonsensical numeric options at parse time instead
+  of failing confusingly later: `--timeout` must be positive (a `0` used to
+  parse fine and force-kill xcodebuild on its first check with a misleading
+  "timed out" error), `--wait` must not be negative, and
+  `--status-bar-battery` must be 0-100 (bad values used to only fail after a
+  full build and simulator boot, when simctl rejected them).
 - `simshot verify` no longer passes an output tree that holds nothing to check.
   An empty output directory, a `raw/`-only tree (a `shoot` run without
   `--resize`), and a device folder with no language folders inside it all used

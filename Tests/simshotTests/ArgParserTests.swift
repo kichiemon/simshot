@@ -200,6 +200,51 @@ final class ArgParserTests: XCTestCase {
             contains: "--wait")
     }
 
+    func testZeroTimeoutRejected() {
+        assertUsage(
+            [
+                "--project", "MyApp.xcodeproj", "--scheme", "MyApp", "--bundle-id", "c", "--devices", "d",
+                "--scenes", "home", "--timeout", "0",
+            ],
+            contains: "positive")
+    }
+
+    func testNegativeWaitRejected() {
+        assertUsage(
+            [
+                "--project", "MyApp.xcodeproj", "--scheme", "MyApp", "--bundle-id", "c", "--devices", "d",
+                "--scenes", "home", "--wait", "-1",
+            ],
+            contains: "--wait")
+    }
+
+    func testBatteryOutOfRangeRejected() {
+        assertUsage(
+            [
+                "--project", "MyApp.xcodeproj", "--scheme", "MyApp", "--bundle-id", "c", "--devices", "d",
+                "--scenes", "home", "--status-bar-battery", "101",
+            ],
+            contains: "between 0 and 100")
+        assertUsage(
+            [
+                "--project", "MyApp.xcodeproj", "--scheme", "MyApp", "--bundle-id", "c", "--devices", "d",
+                "--scenes", "home", "--status-bar-battery", "-5",
+            ],
+            contains: "between 0 and 100")
+    }
+
+    func testBoundaryValuesAccepted() throws {
+        // The extremes users may legitimately set: fractional timeout, zero
+        // wait (instant capture), battery at either end of the scale.
+        let options = try ArgParser.parseShoot([
+            "--project", "MyApp.xcodeproj", "--scheme", "MyApp", "--bundle-id", "c", "--devices", "d",
+            "--scenes", "home", "--timeout", "0.5", "--wait", "0", "--status-bar-battery", "0",
+        ])
+        XCTAssertEqual(options.timeout, 0.5)
+        XCTAssertEqual(options.wait, 0)
+        XCTAssertEqual(options.statusBarBattery, 0)
+    }
+
     func testInvalidLocalesEntry() {
         assertUsage(
             [
