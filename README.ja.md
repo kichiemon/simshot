@@ -80,7 +80,7 @@ curl -fsSL https://raw.githubusercontent.com/kichiemon/simshot/main/install.sh |
 `SIMSHOT_VERSION`（リリースタグ）と `SIMSHOT_INSTALL_DIR` でカスタマイズできます:
 
 ```bash
-SIMSHOT_VERSION=v0.2.1 SIMSHOT_INSTALL_DIR=~/.local/bin \
+SIMSHOT_VERSION=v0.2.2 SIMSHOT_INSTALL_DIR=~/.local/bin \
   curl -fsSL https://raw.githubusercontent.com/kichiemon/simshot/main/install.sh | bash
 ```
 
@@ -108,10 +108,10 @@ GitHub Releases から対応アーキテクチャのプリビルドバイナリ�
 
 ```bash
 # Apple Silicon (arm64)
-curl -sL https://github.com/kichiemon/simshot/releases/download/v0.2.1/simshot-macos-arm64 -o /usr/local/bin/simshot && chmod +x /usr/local/bin/simshot
+curl -sL https://github.com/kichiemon/simshot/releases/download/v0.2.2/simshot-macos-arm64 -o /usr/local/bin/simshot && chmod +x /usr/local/bin/simshot
 
 # Intel (x86_64)
-curl -sL https://github.com/kichiemon/simshot/releases/download/v0.2.1/simshot-macos-x86_64 -o /usr/local/bin/simshot && chmod +x /usr/local/bin/simshot
+curl -sL https://github.com/kichiemon/simshot/releases/download/v0.2.2/simshot-macos-x86_64 -o /usr/local/bin/simshot && chmod +x /usr/local/bin/simshot
 ```
 
 ### Nix
@@ -129,7 +129,7 @@ nix profile install github:kichiemon/simshot   # プロファイルへインス�
 
 ```bash
 mise use -g github:kichiemon/simshot   # グローバル設定へインストール
-simshot --version                      # v0.2.1
+simshot --version                      # v0.2.2
 ```
 
 従来の `ubi` backend（`mise use ubi:kichiemon/simshot`）も同じ `simshot-macos-{os}-{arch}` アセットを解決して動作しますが、mise で deprecated となり mise 2027.1.0 で削除予定です。
@@ -159,7 +159,7 @@ npm i -g simshot
 npx simshot shoot
 ```
 
-macOS（arm64 / x86_64）+ Node.js 14+ が必要です。`postinstall` で GitHub Releases から対応アーキテクチャのプリビルド単体バイナリをダウンロードし、sha256 を検証します（実装は [`npm/`](npm/)）。npm では `simshot` として公開済みです（v0.2.1）。
+macOS（arm64 / x86_64）+ Node.js 14+ が必要です。`postinstall` で GitHub Releases から対応アーキテクチャのプリビルド単体バイナリをダウンロードし、sha256 を検証します（実装は [`npm/`](npm/)）。npm では `simshot` として公開済みです（v0.2.2）。
 
 ## クイックスタート
 

@@ -80,7 +80,7 @@ curl -fsSL https://raw.githubusercontent.com/kichiemon/simshot/main/install.sh |
 Customize with `SIMSHOT_VERSION` (release tag) and `SIMSHOT_INSTALL_DIR`:
 
 ```bash
-SIMSHOT_VERSION=v0.2.1 SIMSHOT_INSTALL_DIR=~/.local/bin \
+SIMSHOT_VERSION=v0.2.2 SIMSHOT_INSTALL_DIR=~/.local/bin \
   curl -fsSL https://raw.githubusercontent.com/kichiemon/simshot/main/install.sh | bash
 ```
 
@@ -116,10 +116,10 @@ Grab the prebuilt binary for your architecture directly from GitHub Releases —
 
 ```bash
 # Apple Silicon (arm64)
-curl -sL https://github.com/kichiemon/simshot/releases/download/v0.2.1/simshot-macos-arm64 -o /usr/local/bin/simshot && chmod +x /usr/local/bin/simshot
+curl -sL https://github.com/kichiemon/simshot/releases/download/v0.2.2/simshot-macos-arm64 -o /usr/local/bin/simshot && chmod +x /usr/local/bin/simshot
 
 # Intel (x86_64)
-curl -sL https://github.com/kichiemon/simshot/releases/download/v0.2.1/simshot-macos-x86_64 -o /usr/local/bin/simshot && chmod +x /usr/local/bin/simshot
+curl -sL https://github.com/kichiemon/simshot/releases/download/v0.2.2/simshot-macos-x86_64 -o /usr/local/bin/simshot && chmod +x /usr/local/bin/simshot
 ```
 
 ### Nix
@@ -137,7 +137,7 @@ nix profile install github:kichiemon/simshot   # install into your profile
 
 ```bash
 mise use -g github:kichiemon/simshot   # install into your global config
-simshot --version                      # v0.2.1
+simshot --version                      # v0.2.2
 ```
 
 The legacy `ubi` backend (`mise use ubi:kichiemon/simshot`) resolves the same `simshot-macos-{os}-{arch}` release assets and also works, but it is deprecated in mise and will be removed in mise 2027.1.0.
@@ -157,16 +157,16 @@ brew install simshot
 class Simshot < Formula
   desc "App Store screenshot capture CLI (simctl only, no XCUITest)"
   homepage "https://github.com/kichiemon/simshot"
-  version "0.2.1"
+  version "0.2.2"
   license "MIT"
 
   on_macos do
     on_arm do
-      url "https://github.com/kichiemon/simshot/releases/download/v0.2.1/simshot-macos-arm64.tar.gz"
+      url "https://github.com/kichiemon/simshot/releases/download/v0.2.2/simshot-macos-arm64.tar.gz"
       sha256 "6819ad59d5999254085126c582dea5c31274646578b7931799419cc90cc7c62d"
     end
     on_intel do
-      url "https://github.com/kichiemon/simshot/releases/download/v0.2.1/simshot-macos-x86_64.tar.gz"
+      url "https://github.com/kichiemon/simshot/releases/download/v0.2.2/simshot-macos-x86_64.tar.gz"
       sha256 "5a489aa2aa84190c12a4ae4c9cfb6309e1ea1037b26260d48bd9197dc730ca3f"
     end
   end
@@ -193,7 +193,7 @@ npm i -g simshot
 npx simshot shoot
 ```
 
-Requires Node.js 14+ on macOS (arm64/x86_64). The package downloads the matching prebuilt single binary from GitHub Releases in `postinstall` (see [`npm/`](npm/)) and verifies its sha256. Published on npm as `simshot` (0.2.1).
+Requires Node.js 14+ on macOS (arm64/x86_64). The package downloads the matching prebuilt single binary from GitHub Releases in `postinstall` (see [`npm/`](npm/)) and verifies its sha256. Published on npm as `simshot` (0.2.2).
 
 ## Quick start
 
