@@ -65,3 +65,50 @@ final class ShotSpecTests: XCTestCase {
         XCTAssertTrue(file.shots[1].scrollBottom)
     }
 }
+
+extension ShotSpecTests {
+    func testShotRejectsEmptyName() {
+        let json = #"{"name": "", "scene": "home"}"#
+        XCTAssertThrowsError(try JSONDecoder().decode(Shot.self, from: json.data(using: .utf8)!)) { error in
+            guard case DecodingError.dataCorrupted = error else {
+                return XCTFail("expected dataCorrupted, got \(error)")
+            }
+        }
+    }
+
+    func testShotRejectsEmptyScene() {
+        let json = #"{"name": "01.png", "scene": ""}"#
+        XCTAssertThrowsError(try JSONDecoder().decode(Shot.self, from: json.data(using: .utf8)!)) { error in
+            guard case DecodingError.dataCorrupted = error else {
+                return XCTFail("expected dataCorrupted, got \(error)")
+            }
+        }
+    }
+
+    func testShotRejectsNegativeWait() {
+        let json = #"{"name": "01.png", "scene": "home", "wait": -1}"#
+        XCTAssertThrowsError(try JSONDecoder().decode(Shot.self, from: json.data(using: .utf8)!)) { error in
+            guard case DecodingError.dataCorrupted = error else {
+                return XCTFail("expected dataCorrupted, got \(error)")
+            }
+        }
+    }
+
+    func testShotRejectsNegativeStrokes() {
+        let json = #"{"name": "01.png", "scene": "home", "strokes": -2}"#
+        XCTAssertThrowsError(try JSONDecoder().decode(Shot.self, from: json.data(using: .utf8)!)) { error in
+            guard case DecodingError.dataCorrupted = error else {
+                return XCTFail("expected dataCorrupted, got \(error)")
+            }
+        }
+    }
+
+    func testShotRejectsPathLikeName() {
+        let json = #"{"name": "../escape.png", "scene": "home"}"#
+        XCTAssertThrowsError(try JSONDecoder().decode(Shot.self, from: json.data(using: .utf8)!)) { error in
+            guard case DecodingError.dataCorrupted = error else {
+                return XCTFail("expected dataCorrupted, got \(error)")
+            }
+        }
+    }
+}

@@ -240,7 +240,8 @@ public enum ArgParser {
         case .valueNotFound(_, let context):
             return "\(render(context.codingPath)) must not be null (\(context.debugDescription))"
         case .dataCorrupted(let context):
-            return context.debugDescription
+            let path = render(context.codingPath)
+            return path.isEmpty ? context.debugDescription : "\(path): \(context.debugDescription)"
         @unknown default:
             return error.localizedDescription
         }

@@ -81,6 +81,34 @@ public struct Shot: Codable, Equatable {
         scrollBottom = try container.decodeIfPresent(Bool.self, forKey: .scrollBottom) ?? false
         wait = try container.decodeIfPresent(Int.self, forKey: .wait) ?? 6
         uiTesting = try container.decodeIfPresent(Bool.self, forKey: .uiTesting) ?? true
+
+        guard !name.isEmpty else {
+            throw DecodingError.dataCorruptedError(
+                forKey: .name, in: container,
+                debugDescription: "name must not be empty")
+        }
+        guard !scene.isEmpty else {
+            throw DecodingError.dataCorruptedError(
+                forKey: .scene, in: container,
+                debugDescription: "scene must not be empty")
+        }
+        guard !name.contains("/") && !name.contains("\\") && name != "." && name != ".." else {
+            throw DecodingError.dataCorruptedError(
+                forKey: .name, in: container,
+                debugDescription: "name must be a single file name, not a path")
+        }
+        guard wait >= 0 else {
+            throw DecodingError.dataCorruptedError(
+                forKey: .wait, in: container,
+                debugDescription: "wait must not be negative")
+        }
+        if let strokes {
+            guard strokes >= 0 else {
+                throw DecodingError.dataCorruptedError(
+                    forKey: .strokes, in: container,
+                    debugDescription: "strokes must not be negative")
+            }
+        }
     }
 
     public func encode(to encoder: Encoder) throws {
