@@ -69,7 +69,11 @@ public enum ArgParser {
             case "--scheme":
                 options.scheme = try takeValue(for: flag, inline: inline, &index)
             case "--app-path":
-                options.appPath = URL(fileURLWithPath: try takeValue(for: flag, inline: inline, &index))
+                let appPathValue = try takeValue(for: flag, inline: inline, &index)
+                guard !appPathValue.isEmpty else {
+                    throw SimshotError.usage("--app-path must not be empty.")
+                }
+                options.appPath = URL(fileURLWithPath: appPathValue)
             case "--bundle-id":
                 options.bundleID = try takeValue(for: flag, inline: inline, &index)
             case "--devices":
@@ -129,6 +133,26 @@ public enum ArgParser {
         // otherwise parses fine and ProcessRunner kills xcodebuild instantly with
         // a misleading "timed out" error; a bad battery value only fails after a
         // full build and simulator boot, where simctl rejects it.
+        // Empty/contradictory inputs are rejected here too, so a mis-typed flag
+        // fails before any build or simulator is touched.
+        if let project = options.project, project.isEmpty {
+            throw SimshotError.usage("--project must not be empty.")
+        }
+        if let workspace = options.workspace, workspace.isEmpty {
+            throw SimshotError.usage("--workspace must not be empty.")
+        }
+        if options.project != nil && options.workspace != nil {
+            throw SimshotError.usage("--project and --workspace are mutually exclusive.")
+        }
+        guard !options.outputDir.isEmpty else {
+            throw SimshotError.usage("--output must not be empty.")
+        }
+        guard !options.derivedData.isEmpty else {
+            throw SimshotError.usage("--derived-data must not be empty.")
+        }
+        guard !options.statusBarTime.isEmpty else {
+            throw SimshotError.usage("--status-bar-time must not be empty.")
+        }
         guard options.timeout > 0 else {
             throw SimshotError.usage("--timeout must be a positive number of seconds (got \(options.timeout)).")
         }

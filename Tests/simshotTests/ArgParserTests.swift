@@ -233,6 +233,41 @@ final class ArgParserTests: XCTestCase {
             contains: "between 0 and 100")
     }
 
+    func testProjectAndWorkspaceMutuallyExclusive() {
+        assertUsage(
+            [
+                "--project", "MyApp.xcodeproj", "--workspace", "MyApp.xcworkspace", "--scheme", "MyApp",
+                "--bundle-id", "c", "--devices", "d", "--scenes", "home",
+            ],
+            contains: "mutually exclusive")
+    }
+
+    func testEmptyProjectRejected() {
+        assertUsage(
+            [
+                "--project", "", "--scheme", "MyApp", "--bundle-id", "c", "--devices", "d",
+                "--scenes", "home",
+            ],
+            contains: "--project")
+    }
+
+    func testEmptyOutputRejected() {
+        assertUsage(
+            [
+                "--project", "MyApp.xcodeproj", "--scheme", "MyApp", "--bundle-id", "c", "--devices", "d",
+                "--scenes", "home", "--output", "",
+            ],
+            contains: "--output")
+    }
+
+    func testEmptyAppPathRejected() {
+        assertUsage(
+            [
+                "--app-path", "", "--bundle-id", "c", "--devices", "d", "--scenes", "home",
+            ],
+            contains: "--app-path")
+    }
+
     func testBoundaryValuesAccepted() throws {
         // The extremes users may legitimately set: fractional timeout, zero
         // wait (instant capture), battery at either end of the scale.

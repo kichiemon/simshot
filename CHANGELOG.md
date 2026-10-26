@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- `simshot shoot` now rejects contradictory or empty inputs at parse time:
+  `--project` and `--workspace` together, and empty values for `--project`,
+  `--workspace`, `--app-path`, `--output`, `--derived-data`, and
+  `--status-bar-time`. These used to slip through and fail later (or, for
+  `--app-path ""`, silently resolve to the current working directory).
 - `simshot shoot` now rejects invalid shot entries at parse time instead of
   failing later or writing outside the output tree: an empty `name` or `scene`,
   a negative `wait` or `strokes`, and a `name` that looks like a path (contains
