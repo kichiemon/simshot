@@ -20,6 +20,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   a separator or is `.`/`..`). The error names the offending entry, e.g.
   `shots[0].name: name must not be empty`.
 
+- `simshot verify` now flags a device/language folder that holds more than 10
+  screenshots, since App Store Connect accepts at most 10 per device display
+  size. Reported as `too-many-screenshots` (exit `1`).
+
 ## [0.2.2] - 2026-10-18
 
 ### Fixed

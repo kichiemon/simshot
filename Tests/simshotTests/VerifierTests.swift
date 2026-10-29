@@ -325,4 +325,17 @@ final class VerifierTests: XCTestCase {
         XCTAssertEqual(report.folders.count, 4)
         XCTAssertEqual(report.checkedFiles, 4)
     }
+
+    func testMoreThanTenScreenshotsIsReported() throws {
+        let folder = try makeFolder("iphone-17-pro-max", "en")
+        for i in 1...11 {
+            try writePNG(width: 1290, height: 2796, alpha: false, named: String(format: "%02d_home.png", i), in: folder)
+        }
+
+        let report = Verifier.verify(root: root)
+
+        XCTAssertEqual(report.issues.count, 1)
+        XCTAssertEqual(report.issues[0].kind, .tooManyScreenshots)
+        XCTAssertTrue(report.issues[0].message.contains("11"))
+    }
 }

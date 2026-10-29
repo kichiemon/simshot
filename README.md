@@ -274,7 +274,7 @@ simshot verify — appstore
    → run shoot with `--resize` to write flattened App Store copies
 ```
 
-It flags dimensions that aren't an accepted size, an alpha channel, mixed sizes inside one folder, and empty or missing device/language folders. An output tree with nothing to check fails too (no device folders at all, a `raw/`-only tree from a `shoot` run without `--resize`, or a device folder with no language folders), because checking zero files is not the same as every file being publishable. `raw/` is skipped, `--devices`/`--langs` require those folders to exist, and `--json` gives the same report for tooling.
+It flags dimensions that aren't an accepted size, an alpha channel, mixed sizes inside one folder, more than 10 screenshots in one folder, and empty or missing device/language folders. An output tree with nothing to check fails too (no device folders at all, a `raw/`-only tree from a `shoot` run without `--resize`, or a device folder with no language folders), because checking zero files is not the same as every file being publishable. `raw/` is skipped, `--devices`/`--langs` require those folders to exist, and `--json` gives the same report for tooling.
 
 ## `simshot shoot` reference
 

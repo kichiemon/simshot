@@ -85,6 +85,7 @@ would reject or ignore, so a bad capture fails CI instead of failing review.
 - dimensions that are not an accepted App Store screenshot size
 - an alpha channel (rejected at upload)
 - mixed sizes inside one device/language folder
+- more than 10 screenshots in one device/language folder (App Store Connect limit)
 - empty or missing device/language folders
 - nothing to inspect at all: no device folders, a `raw/`-only tree (a `shoot`
   run without `--resize`), or a device folder with no language folders. Checking

@@ -12,6 +12,7 @@ public struct VerifyIssue: Equatable {
         case wrongSize = "wrong-size"
         case inconsistentSize = "inconsistent-size"
         case alphaChannel = "alpha-channel"
+        case tooManyScreenshots = "too-many-screenshots"
     }
 
     public let kind: Kind
@@ -199,6 +200,16 @@ public enum Verifier {
                             target: nil
                         ))
                     continue
+                }
+
+                if files.count > 10 {
+                    issues.append(
+                        VerifyIssue(
+                            kind: .tooManyScreenshots,
+                            path: "\(device)/\(language)",
+                            message: "\(files.count) screenshots; App Store Connect allows at most 10 per device size",
+                            fix: "keep at most 10 screenshots per device/language folder"
+                        ))
                 }
 
                 var folderSize: CGSize?
