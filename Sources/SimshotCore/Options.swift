@@ -184,8 +184,33 @@ public enum ArgParser {
             guard !options.scenes.isEmpty else {
                 throw SimshotError.usage("Provide --shots <config.json> or --scenes home,trace,...")
             }
+            for scene in options.scenes {
+                guard !scene.contains("/") && !scene.contains("\\") && scene != "." && scene != ".." else {
+                    throw SimshotError.usage("--scenes entries must be single names, not paths (got '\(scene)').")
+                }
+            }
             options.shots = options.scenes.map {
                 Shot(name: "\($0).png", scene: $0, wait: options.wait, uiTesting: options.uiTesting)
+            }
+        }
+
+        // Languages and device tokens become path components (device tokens are
+        // also used as directory names), so reject anything that could escape the
+        // output tree or collapse to "."/"..".
+        for language in options.languages {
+            let languageIsPath =
+                language.contains("/") || language.contains("\\") || language == "." || language == ".."
+            guard !languageIsPath else {
+                throw SimshotError.usage(
+                    "--langs entries must be single language codes, not paths (got '\(language)').")
+            }
+        }
+        for device in options.devices {
+            let deviceIsPath =
+                device.contains("/") || device.contains("\\") || device == "." || device == ".."
+            guard !deviceIsPath else {
+                throw SimshotError.usage(
+                    "--devices entries must be single names or UDIDs, not paths (got '\(device)').")
             }
         }
     }
@@ -201,11 +226,16 @@ public enum ArgParser {
     static func parseLocales(_ value: String) throws -> [String: String] {
         var result: [String: String] = [:]
         for pair in csv(value) {
-            let parts = pair.split(separator: "=")
+            let parts = pair.split(separator: "=", omittingEmptySubsequences: false)
             guard parts.count == 2 else {
                 throw SimshotError.usage("Invalid --locales entry '\(pair)' (expected lang=locale)")
             }
-            result[String(parts[0])] = String(parts[1])
+            let key = String(parts[0]).trimmingCharacters(in: .whitespaces)
+            let val = String(parts[1]).trimmingCharacters(in: .whitespaces)
+            guard !key.isEmpty, !val.isEmpty else {
+                throw SimshotError.usage("Invalid --locales entry '\(pair)' (expected lang=locale)")
+            }
+            result[key] = val
         }
         return result
     }

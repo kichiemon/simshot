@@ -23,6 +23,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `simshot verify` now flags a device/language folder that holds more than 10
   screenshots, since App Store Connect accepts at most 10 per device display
   size. Reported as `too-many-screenshots` (exit `1`).
+- `simshot shoot` now rejects `--scenes`, `--langs`, and `--devices` entries that
+  look like paths (contain a separator or are `.`/`..`) at parse time, and trims
+  whitespace around `--locales` keys and values. These used to slip through and
+  could write outside the output tree or collapse to the current/parent
+  directory.
 
 ## [0.2.2] - 2026-10-18
 
