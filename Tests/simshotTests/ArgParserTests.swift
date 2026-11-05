@@ -425,4 +425,62 @@ final class ArgParserTests: XCTestCase {
         addTeardownBlock { try? FileManager.default.removeItem(at: url) }
         return url
     }
+
+    // MARK: - Bundle ID auto-detection from --app-path
+
+    private func makeTempApp(bundleID: String?) throws -> URL {
+        let base = FileManager.default.temporaryDirectory
+            .appendingPathComponent("simshot-app-\(UUID().uuidString)")
+        let app = base.appendingPathComponent("MyApp.app")
+        try FileManager.default.createDirectory(at: app, withIntermediateDirectories: true)
+        if let bundleID {
+            let plist = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <plist version="1.0"><dict><key>CFBundleIdentifier</key><string>\(bundleID)</string></dict></plist>
+                """
+            try plist.write(to: app.appendingPathComponent("Info.plist"), atomically: true, encoding: .utf8)
+        }
+        addTeardownBlock { try? FileManager.default.removeItem(at: base) }
+        return app
+    }
+
+    func testAppPathAutoDetectsBundleID() throws {
+        let app = try makeTempApp(bundleID: "com.example.detected")
+        let options = try ArgParser.parseShoot([
+            "--app-path", app.path,
+            "--devices", "iphone-17-pro-max",
+            "--scenes", "home",
+        ])
+        XCTAssertEqual(options.bundleID, "com.example.detected")
+    }
+
+    func testAppPathWithoutPlistStillRequiresBundleID() {
+        let app: URL
+        do { app = try makeTempApp(bundleID: nil) } catch {
+            XCTFail()
+            return
+        }
+        XCTAssertThrowsError(
+            try ArgParser.parseShoot([
+                "--app-path", app.path,
+                "--devices", "iphone-17-pro-max",
+                "--scenes", "home",
+            ])
+        ) { error in
+            guard case SimshotError.usage = error else {
+                return XCTFail("expected usage, got \(error)")
+            }
+        }
+    }
+
+    func testExplicitBundleIDWinsOverAutoDetection() throws {
+        let app = try makeTempApp(bundleID: "com.example.detected")
+        let options = try ArgParser.parseShoot([
+            "--app-path", app.path,
+            "--bundle-id", "com.example.explicit",
+            "--devices", "iphone-17-pro-max",
+            "--scenes", "home",
+        ])
+        XCTAssertEqual(options.bundleID, "com.example.explicit")
+    }
 }

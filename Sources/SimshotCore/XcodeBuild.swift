@@ -37,7 +37,31 @@ public enum XcodeBuild {
         return app
     }
 
+    /// Read the app's bundle identifier from its `Info.plist`.
+    ///
+    /// Returns `nil` when the plist is missing, unreadable, or has no
+    /// `CFBundleIdentifier`, so callers can fall back to an explicit value.
+    public static func bundleIdentifier(at appURL: URL) -> String? {
+        let plistURL = appURL.appendingPathComponent("Info.plist")
+        guard let data = try? Data(contentsOf: plistURL) else { return nil }
+        guard
+            let plist = try? PropertyListSerialization.propertyList(
+                from: data, options: [], format: nil) as? [String: Any]
+        else { return nil }
+        guard let identifier = plist["CFBundleIdentifier"] as? String,
+            !identifier.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        else { return nil }
+        return identifier
+    }
+
     /// Locate the built `.app` bundle inside a DerivedData directory.
+    ///
+    /// Handles both the common Debug layout (`Build/Products/Debug-iphonesimulator/`)
+    /// and any other `*-iphonesimulator` configuration directory (e.g. Release),
+    /// as well as `.app` bundles placed directly under `Build/Products`. Among
+    /// multiple configurations the Debug one is preferred (Debug-named
+    /// directories win; ties are broken alphabetically); within a directory the
+    /// first `.app` in name order wins, so the result is deterministic.
     public static func findApp(derivedDataPath: String) -> URL? {
         let products = URL(fileURLWithPath: derivedDataPath).appendingPathComponent("Build/Products")
         guard
@@ -47,17 +71,43 @@ public enum XcodeBuild {
         else {
             return nil
         }
-        for entry in entries where entry.pathExtension == "app" {
-            return entry
+        // A `.app` placed directly under `Build/Products` wins.
+        if let direct =
+            entries
+            .filter({ $0.pathExtension == "app" })
+            .sorted(by: { $0.lastPathComponent < $1.lastPathComponent })
+            .first
+        {
+            return direct
         }
-        let debugDir = products.appendingPathComponent("Debug-iphonesimulator")
-        guard
-            let apps = try? FileManager.default.contentsOfDirectory(
-                at: debugDir, includingPropertiesForKeys: nil
-            )
-        else {
-            return nil
+        // Otherwise look inside `*-iphonesimulator` configuration directories,
+        // preferring Debug over Release (and any other configuration) and
+        // returning the first `.app` in name order within the chosen one.
+        let configDirs =
+            entries
+            .filter { $0.lastPathComponent.contains("iphonesimulator") }
+            .sorted { lhs, rhs in
+                let lDebug = lhs.lastPathComponent.localizedCaseInsensitiveContains("debug")
+                let rDebug = rhs.lastPathComponent.localizedCaseInsensitiveContains("debug")
+                if lDebug != rDebug { return lDebug }
+                return lhs.lastPathComponent < rhs.lastPathComponent
+            }
+        for dir in configDirs {
+            guard
+                let apps = try? FileManager.default.contentsOfDirectory(
+                    at: dir, includingPropertiesForKeys: nil
+                )
+            else { continue }
+            if let app =
+                apps
+                .filter({ $0.pathExtension == "app" })
+                .sorted(by: { $0.lastPathComponent < $1.lastPathComponent })
+                .first
+            {
+                return app
+            }
         }
-        return apps.first { $0.pathExtension == "app" }
+        return nil
     }
+
 }

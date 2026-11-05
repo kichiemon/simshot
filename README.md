@@ -286,7 +286,7 @@ BUILD
   --app-path <path.app>            Skip building; use an existing .app bundle
 
 REQUIRED
-  --bundle-id <id>                 App bundle identifier
+  --bundle-id <id>                 App bundle identifier (auto-detected from --app-path's Info.plist when omitted)
   --devices <list>                 Simulator names or UDIDs (comma-separated)
 
 SHOTS

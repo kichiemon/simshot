@@ -171,8 +171,15 @@ public enum ArgParser {
                 throw SimshotError.usage("--scheme is required.")
             }
         }
-        guard !options.bundleID.isEmpty else {
-            throw SimshotError.usage("--bundle-id is required.")
+        if options.bundleID.isEmpty {
+            if let appPath = options.appPath,
+                let detected = XcodeBuild.bundleIdentifier(at: appPath)
+            {
+                options.bundleID = detected
+            } else {
+                throw SimshotError.usage(
+                    "--bundle-id is required (or pass --app-path pointing at an .app with a readable Info.plist).")
+            }
         }
         guard !options.devices.isEmpty else {
             throw SimshotError.usage("--devices is required (e.g. iphone-17-pro-max,ipad-pro-13).")

@@ -245,7 +245,7 @@ BUILD
   --app-path <path.app>            빌드 없이 기존 .app 사용
 
 REQUIRED
-  --bundle-id <id>                 번들 식별자
+  --bundle-id <id>                 번들 식별자 (--app-path의 Info.plist에서 자동 감지)
   --devices <list>                 시뮬레이터 이름 or UDID(쉼표 구분)
 
 SHOTS

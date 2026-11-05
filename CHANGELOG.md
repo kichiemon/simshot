@@ -7,8 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `simshot shoot --app-path` no longer requires `--bundle-id`: the bundle
+  identifier is read from the `.app`'s `Info.plist` (`CFBundleIdentifier`) when
+  `--bundle-id` is omitted. An explicit `--bundle-id` still takes precedence.
+  `XcodeBuild.bundleIdentifier(at:)` exposes the same read for reuse.
+
 ### Fixed
 
+- `XcodeBuild.findApp` now locates the built `.app` in any `*-iphonesimulator`
+  configuration directory (e.g. `Release-iphonesimulator`), not just
+  `Debug-iphonesimulator`, and also handles `.app` bundles placed directly under
+  `Build/Products`. Previously a Release (or otherwise non-Debug) build made
+  `simshot shoot` fail with "Could not find a built .app" even though the
+  bundle existed. Selection is now deterministic (Debug preferred, then name
+  order).
 - `simshot doctor` now counts only iOS runtimes in the "iOS runtimes" check.
   On toolchains that also have watchOS/tvOS/visionOS runtimes installed, the
   previous count included every platform, so the reported number was inflated

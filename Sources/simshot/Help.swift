@@ -98,7 +98,8 @@ enum Help {
           --app-path <path.app>          Skip building; use an existing .app bundle
 
         REQUIRED:
-          --bundle-id <id>               App bundle identifier (e.g. com.example.myapp)
+          --bundle-id <id>               App bundle identifier (e.g. com.example.myapp);
+                                         auto-detected from --app-path's Info.plist when omitted
           --devices <list>               Comma-separated simulator names or UDIDs
                                          (e.g. iphone-17-pro-max,ipad-pro-13)
 

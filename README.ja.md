@@ -245,7 +245,7 @@ BUILD
   --app-path <path.app>            ビルドせず既存 .app を使用
 
 REQUIRED
-  --bundle-id <id>                 バンドル ID
+  --bundle-id <id>                 バンドル ID (省略時は --app-path の Info.plist から自動検出)
   --devices <list>                 シミュレータ名 or UDID（カンマ区切り）
 
 SHOTS
