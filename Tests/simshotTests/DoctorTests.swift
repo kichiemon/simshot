@@ -117,4 +117,37 @@ final class DoctorTests: XCTestCase {
         XCTAssertEqual(results.first(where: { $0.name == "Xcode" })?.status, .fail)
         XCTAssertEqual(results.first(where: { $0.name == "simctl" })?.status, .ok)
     }
+
+    // MARK: - iOS runtime counting
+
+    func testIosRuntimeCountFiltersNonIOSPlatforms() {
+        let runtimes: [[String: Any]] = [
+            ["name": "iOS 27.2", "platform": "iOS", "isAvailable": true],
+            ["name": "watchOS 11.0", "platform": "watchOS", "isAvailable": true],
+            ["name": "tvOS 18.0", "platform": "tvOS", "isAvailable": true],
+            ["name": "visionOS 2.0", "platform": "visionOS", "isAvailable": true],
+            ["name": "iOS 26.4", "platform": "iOS", "isAvailable": false],
+        ]
+        XCTAssertEqual(Doctor.iosRuntimeCount(from: runtimes), 1)
+    }
+
+    func testIosRuntimeCountFallsBackToNameWhenPlatformMissing() {
+        let runtimes: [[String: Any]] = [
+            ["name": "iOS 26.4", "isAvailable": true],
+            ["name": "watchOS 11.0", "isAvailable": true],
+        ]
+        XCTAssertEqual(Doctor.iosRuntimeCount(from: runtimes), 1)
+    }
+
+    func testIosRuntimeCountFallsBackToIdentifier() {
+        let runtimes: [[String: Any]] = [
+            ["name": "Some Runtime", "identifier": "com.apple.CoreSimulator.SimRuntime.iOS-26-4", "isAvailable": true]
+        ]
+        XCTAssertEqual(Doctor.iosRuntimeCount(from: runtimes), 1)
+    }
+
+    func testIosRuntimeCountEmpty() {
+        XCTAssertEqual(Doctor.iosRuntimeCount(from: []), 0)
+    }
+
 }

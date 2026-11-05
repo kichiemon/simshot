@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- `simshot doctor` now counts only iOS runtimes in the "iOS runtimes" check.
+  On toolchains that also have watchOS/tvOS/visionOS runtimes installed, the
+  previous count included every platform, so the reported number was inflated
+  and could mask a missing iOS runtime.
 - `simshot shoot` now rejects contradictory or empty inputs at parse time:
   `--project` and `--workspace` together, and empty values for `--project`,
   `--workspace`, `--app-path`, `--output`, `--derived-data`, and

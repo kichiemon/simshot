@@ -74,7 +74,7 @@ public enum Doctor {
             let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
             let list = json["runtimes"] as? [[String: Any]]
         {
-            runtimeCount = list.filter { ($0["isAvailable"] as? Bool) ?? false }.count
+            runtimeCount = Doctor.iosRuntimeCount(from: list)
         }
 
         let deviceCount = (try? Simulator.listAvailable())?.count ?? 0
@@ -86,6 +86,28 @@ public enum Doctor {
             iosRuntimeCount: runtimeCount,
             availableDeviceCount: deviceCount
         )
+    }
+
+    /// Count the iOS runtimes in a parsed `simctl list runtimes -j` array.
+    ///
+    /// `simctl` reports runtimes for every platform (iOS, watchOS, tvOS,
+    /// visionOS, ...), but the "iOS runtimes" check is only meaningful for
+    /// iOS, so non-iOS runtimes are ignored. Older toolchains that omit the
+    /// `platform` field fall back to the runtime name/identifier.
+    public static func iosRuntimeCount(from runtimes: [[String: Any]]) -> Int {
+        runtimes.filter { runtime in
+            guard (runtime["isAvailable"] as? Bool) ?? false else { return false }
+            if let platform = runtime["platform"] as? String {
+                return platform == "iOS"
+            }
+            if let name = runtime["name"] as? String, name.hasPrefix("iOS") {
+                return true
+            }
+            if let identifier = runtime["identifier"] as? String, identifier.contains("iOS") {
+                return true
+            }
+            return false
+        }.count
     }
 
     /// Turn facts into check results. Pure logic — no side effects.
