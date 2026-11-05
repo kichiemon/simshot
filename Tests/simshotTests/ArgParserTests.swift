@@ -64,6 +64,34 @@ final class ArgParserTests: XCTestCase {
         XCTAssertEqual(options.devices, ["iphone-17-pro-max"])
     }
 
+    func testTrimsWhitespaceFromScalarValues() throws {
+        let options = try ArgParser.parseShoot([
+            "--project", "  MyApp.xcodeproj  ",
+            "--scheme", "  MyApp  ",
+            "--bundle-id", "  com.example.myapp  ",
+            "--devices", "  iphone-17-pro-max  ",
+            "--scenes", "  home  ",
+            "--output", "  shots  ",
+        ])
+        XCTAssertEqual(options.project, "MyApp.xcodeproj")
+        XCTAssertEqual(options.scheme, "MyApp")
+        XCTAssertEqual(options.bundleID, "com.example.myapp")
+        XCTAssertEqual(options.devices, ["iphone-17-pro-max"])
+        XCTAssertEqual(options.shots.map { $0.name }, ["home.png"])
+        XCTAssertEqual(options.outputDir, "shots")
+    }
+
+    func testWhitespaceOnlyValueIsRejected() {
+        XCTAssertThrowsError(
+            try ArgParser.parseShoot([
+                "--project", "   ",
+                "--scheme", "MyApp",
+                "--bundle-id", "com.example.myapp",
+                "--devices", "iphone-17-pro-max",
+                "--scenes", "home",
+            ]))
+    }
+
     func testWorkspaceAlternative() throws {
         let options = try ArgParser.parseShoot([
             "--workspace", "MyApp.xcworkspace",

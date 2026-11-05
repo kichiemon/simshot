@@ -41,12 +41,20 @@ public enum ArgParser {
         var index = 0
 
         func takeValue(for flag: String, inline: String?, _ index: inout Int) throws -> String {
-            if let inline { return inline }
-            guard index + 1 < args.count else {
-                throw SimshotError.usage("Missing value for \(flag)")
+            let rawValue: String
+            if let inline {
+                rawValue = inline
+            } else {
+                guard index + 1 < args.count else {
+                    throw SimshotError.usage("Missing value for \(flag)")
+                }
+                index += 1
+                rawValue = args[index]
             }
-            index += 1
-            return args[index]
+            // Trim surrounding whitespace so `--project " MyApp.xcodeproj "` and
+            // whitespace-only values are handled consistently (the latter are
+            // rejected by `validate` as empty).
+            return rawValue.trimmingCharacters(in: .whitespacesAndNewlines)
         }
 
         while index < args.count {
@@ -225,7 +233,7 @@ public enum ArgParser {
     /// Split a comma-separated value into trimmed, non-empty tokens.
     public static func csv(_ value: String) -> [String] {
         value.split(separator: ",")
-            .map { $0.trimmingCharacters(in: .whitespaces) }
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
             .filter { !$0.isEmpty }
     }
 
@@ -237,8 +245,8 @@ public enum ArgParser {
             guard parts.count == 2 else {
                 throw SimshotError.usage("Invalid --locales entry '\(pair)' (expected lang=locale)")
             }
-            let key = String(parts[0]).trimmingCharacters(in: .whitespaces)
-            let val = String(parts[1]).trimmingCharacters(in: .whitespaces)
+            let key = String(parts[0]).trimmingCharacters(in: .whitespacesAndNewlines)
+            let val = String(parts[1]).trimmingCharacters(in: .whitespacesAndNewlines)
             guard !key.isEmpty, !val.isEmpty else {
                 throw SimshotError.usage("Invalid --locales entry '\(pair)' (expected lang=locale)")
             }

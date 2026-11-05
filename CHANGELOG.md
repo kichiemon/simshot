@@ -54,6 +54,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   could write outside the output tree or collapse to the current/parent
   directory.
 
+- `simshot shoot` now trims surrounding whitespace from every string option
+  value (and `--locales` keys/values), so `--project " MyApp.xcodeproj "` no
+  longer keeps the padding; whitespace-only values are rejected as empty instead
+  of being used verbatim. `XcodeBuild.bundleIdentifier(at:)` also returns the
+  trimmed bundle id, so a padded `CFBundleIdentifier` in `Info.plist` can no
+  longer leak into `--bundle-id`.
+
 ## [0.2.2] - 2026-10-18
 
 ### Fixed

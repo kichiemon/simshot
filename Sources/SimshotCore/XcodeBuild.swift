@@ -51,7 +51,7 @@ public enum XcodeBuild {
         guard let identifier = plist["CFBundleIdentifier"] as? String,
             !identifier.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
         else { return nil }
-        return identifier
+        return identifier.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
     /// Locate the built `.app` bundle inside a DerivedData directory.
