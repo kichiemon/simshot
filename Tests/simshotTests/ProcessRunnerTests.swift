@@ -34,6 +34,10 @@ final class SimulatorRuntimeTests: XCTestCase {
             [26, 4]
         )
         XCTAssertEqual(
+            Simulator.runtimeComponents(of: "com.apple.CoreSimulator.SimRuntime.iOS-27-2-iPhone19-4"),
+            [27, 2]
+        )
+        XCTAssertEqual(
             Simulator.runtimeComponents(of: "com.apple.CoreSimulator.SimRuntime.watchOS-11-0"),
             [11, 0]
         )

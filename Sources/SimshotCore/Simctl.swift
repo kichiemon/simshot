@@ -110,7 +110,14 @@ public struct Simulator: Equatable {
     /// e.g. "com.apple.CoreSimulator.SimRuntime.iOS-26-4" -> [26, 4].
     static func runtimeComponents(of bundleID: String) -> [Int] {
         guard let marker = bundleID.split(separator: ".").last else { return [] }
+        // Runtime identifiers are like "iOS-26-4" or, on newer toolchains,
+        // "iOS-27-2-iPhone19-4", where the trailing segments name the device
+        // family rather than the OS version. Only the leading numeric segments
+        // describe the version, so stop at the first non-numeric segment after
+        // them instead of collecting every integer in the identifier.
         return marker.split(separator: "-")
+            .drop(while: { Int($0) == nil })
+            .prefix(while: { Int($0) != nil })
             .compactMap { Int($0) }
     }
 

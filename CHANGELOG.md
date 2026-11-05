@@ -16,6 +16,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- `Simulator.runtimeComponents` now ignores the device-family suffix that newer
+  Xcode runtimes append to their identifier (e.g.
+  `com.apple.CoreSimulator.SimRuntime.iOS-27-2-iPhone19-4`). Previously every
+  integer in the identifier was collected, turning that runtime into `[27, 2, 4]`
+  and making it look newer than a plain `iOS-27-2` runtime (`[27, 2]`) when
+  `simshot` picks which runtime to use for a duplicate device name. Only the
+  leading OS-version segments are now parsed, so runtime ordering stays correct.
 - `XcodeBuild.findApp` now locates the built `.app` in any `*-iphonesimulator`
   configuration directory (e.g. `Release-iphonesimulator`), not just
   `Debug-iphonesimulator`, and also handles `.app` bundles placed directly under
