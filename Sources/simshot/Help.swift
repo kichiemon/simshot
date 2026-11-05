@@ -54,6 +54,7 @@ enum Help {
         - dimensions that are not an accepted App Store screenshot size
         - an alpha channel (rejected at upload)
         - mixed sizes inside one device/language folder
+        - more than 10 screenshots in one device/language folder
         - empty or missing device/language folders
         - a tree with nothing to inspect (no device folders, a `raw/`-only tree,
           or a device folder with no language folders)
