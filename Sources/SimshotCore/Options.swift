@@ -30,6 +30,24 @@ public struct ShootOptions {
     public init() {}
 }
 
+/// Options for `simshot verify`.
+public struct VerifyOptions {
+    public var root = "appstore"
+    public var devices: [String] = []
+    public var languages: [String] = []
+    public var json = false
+
+    public init() {}
+}
+
+/// Options for `simshot init`.
+public struct InitOptions {
+    public var yes = false
+    public var output = "simshot.yml"
+
+    public init() {}
+}
+
 /// Command-line argument parsing for `simshot shoot`.
 public enum ArgParser {
     /// Parse raw CLI arguments into a validated `ShootOptions`.
@@ -132,6 +150,127 @@ public enum ArgParser {
         }
 
         try validate(&options)
+        return options
+    }
+
+    /// Parse raw CLI arguments into a validated `VerifyOptions`.
+    ///
+    /// Throws `SimshotError.usage` for unknown flags, missing values, or empty
+    /// values. String values are trimmed, consistent with `parseShoot`.
+    public static func parseVerify(_ args: [String]) throws -> VerifyOptions {
+        var options = VerifyOptions()
+        var index = 0
+
+        func takeValue(for flag: String, inline: String?, _ index: inout Int) throws -> String {
+            let rawValue: String
+            if let inline {
+                rawValue = inline
+            } else {
+                guard index + 1 < args.count else {
+                    throw SimshotError.usage("Missing value for \\(flag)")
+                }
+                index += 1
+                rawValue = args[index]
+            }
+            return rawValue.trimmingCharacters(in: .whitespacesAndNewlines)
+        }
+
+        while index < args.count {
+            let raw = args[index]
+            if raw.hasPrefix("--") || raw.hasPrefix("-") {
+                var flag = raw
+                var inline: String?
+                if let equals = raw.firstIndex(of: "=") {
+                    flag = String(raw[raw.startIndex..<equals])
+                    inline = String(raw[raw.index(after: equals)...])
+                }
+                switch flag {
+                case "--devices":
+                    options.devices = csv(try takeValue(for: flag, inline: inline, &index))
+                case "--langs":
+                    options.languages = csv(try takeValue(for: flag, inline: inline, &index))
+                case "--json":
+                    options.json = true
+                default:
+                    throw SimshotError.usage("Unknown option '\\(raw)'. Run `simshot verify --help`.")
+                }
+            } else {
+                options.root = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+            }
+            index += 1
+        }
+
+        // Trimmed above; reject empties / path-like entries for device & lang
+        // tokens, consistent with `parseShoot`.
+        guard !options.root.isEmpty else {
+            throw SimshotError.usage("Output directory must not be empty.")
+        }
+        for device in options.devices {
+            let isPath = device.contains("/") || device.contains("\\") || device == "." || device == ".."
+            guard !isPath else {
+                throw SimshotError.usage("--devices entries must be single names, not paths (got '\(device)').")
+            }
+        }
+        for language in options.languages {
+            let isPath = language.contains("/") || language.contains("\\") || language == "." || language == ".."
+            guard !isPath else {
+                throw SimshotError.usage(
+                    "--langs entries must be single language codes, not paths (got '\(language)').")
+            }
+        }
+        return options
+    }
+
+    /// Parse raw CLI arguments into a validated `InitOptions`.
+    ///
+    /// Throws `SimshotError.usage` for unknown flags, missing values, or empty
+    /// values. String values are trimmed, consistent with `parseShoot`.
+    public static func parseInit(_ args: [String]) throws -> InitOptions {
+        var options = InitOptions()
+        var index = 0
+
+        func takeValue(for flag: String, inline: String?, _ index: inout Int) throws -> String {
+            let rawValue: String
+            if let inline {
+                rawValue = inline
+            } else {
+                guard index + 1 < args.count else {
+                    throw SimshotError.usage("Missing value for \\(flag)")
+                }
+                index += 1
+                rawValue = args[index]
+            }
+            return rawValue.trimmingCharacters(in: .whitespacesAndNewlines)
+        }
+
+        while index < args.count {
+            let raw = args[index]
+            var flag = raw
+            var inline: String?
+            if let equals = raw.firstIndex(of: "=") {
+                flag = String(raw[raw.startIndex..<equals])
+                inline = String(raw[raw.index(after: equals)...])
+            }
+            switch flag {
+            case "--yes", "-y":
+                options.yes = true
+            case "--output":
+                options.output = try takeValue(for: flag, inline: inline, &index)
+            case "--help", "-h":
+                throw SimshotError.usage("help")
+            default:
+                if raw.hasPrefix("--") || raw.hasPrefix("-") {
+                    throw SimshotError.usage("Unknown option '\\(raw)'. Run `simshot init --help`.")
+                } else {
+                    throw SimshotError.usage("Unexpected positional argument '\\(raw)'")
+                }
+            }
+            index += 1
+        }
+
+        guard !options.output.isEmpty else {
+            throw SimshotError.usage("--output must not be empty.")
+        }
         return options
     }
 

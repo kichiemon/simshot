@@ -1,14 +1,6 @@
 import Foundation
 import SimshotCore
 
-/// Options for `simshot verify`.
-struct VerifyOptions {
-    var root = "appstore"
-    var devices: [String] = []
-    var languages: [String] = []
-    var json = false
-}
-
 /// Runs `simshot verify` and prints a human or JSON report.
 ///
 /// Exit code mirrors the report: 0 when everything is publishable, 1 when any

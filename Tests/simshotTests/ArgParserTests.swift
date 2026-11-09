@@ -511,4 +511,116 @@ final class ArgParserTests: XCTestCase {
         ])
         XCTAssertEqual(options.bundleID, "com.example.explicit")
     }
+
+    // MARK: - parseVerify
+
+    func testParseVerifyDefaults() throws {
+        let options = try ArgParser.parseVerify([])
+        XCTAssertEqual(options.root, "appstore")
+        XCTAssertTrue(options.devices.isEmpty)
+        XCTAssertTrue(options.languages.isEmpty)
+        XCTAssertFalse(options.json)
+    }
+
+    func testParseVerifyPositionalRootAndFlags() throws {
+        let options = try ArgParser.parseVerify([
+            "/tmp/out", "--devices", "iphone-17-pro-max,ipad-pro-13",
+            "--langs", "ja,en", "--json",
+        ])
+        XCTAssertEqual(options.root, "/tmp/out")
+        XCTAssertEqual(options.devices, ["iphone-17-pro-max", "ipad-pro-13"])
+        XCTAssertEqual(options.languages, ["ja", "en"])
+        XCTAssertTrue(options.json)
+    }
+
+    func testParseVerifyTrimsValues() throws {
+        let options = try ArgParser.parseVerify([
+            "  /tmp/out  ", "--devices", "  a  ,  b  ", "--langs", "  ja  ,  en  ",
+        ])
+        XCTAssertEqual(options.root, "/tmp/out")
+        XCTAssertEqual(options.devices, ["a", "b"])
+        XCTAssertEqual(options.languages, ["ja", "en"])
+    }
+
+    func testParseVerifyInlineEquals() throws {
+        let options = try ArgParser.parseVerify(["--devices=iphone-17-pro-max", "--json"])
+        XCTAssertEqual(options.devices, ["iphone-17-pro-max"])
+        XCTAssertTrue(options.json)
+    }
+
+    func testParseVerifyRejectsEmptyRoot() {
+        XCTAssertThrowsError(try ArgParser.parseVerify(["   "])) { error in
+            guard case SimshotError.usage = error else {
+                return XCTFail("expected usage, got \(error)")
+            }
+        }
+    }
+
+    func testParseVerifyRejectsPathLikeDevice() {
+        XCTAssertThrowsError(try ArgParser.parseVerify(["--devices", "a/b"])) { error in
+            guard case SimshotError.usage = error else {
+                return XCTFail("expected usage, got \(error)")
+            }
+        }
+    }
+
+    func testParseVerifyMissingValue() {
+        XCTAssertThrowsError(try ArgParser.parseVerify(["--devices"])) { error in
+            guard case SimshotError.usage = error else {
+                return XCTFail("expected usage, got \(error)")
+            }
+        }
+    }
+
+    func testParseVerifyUnknownFlag() {
+        XCTAssertThrowsError(try ArgParser.parseVerify(["--bogus"])) { error in
+            guard case SimshotError.usage = error else {
+                return XCTFail("expected usage, got \(error)")
+            }
+        }
+    }
+
+    // MARK: - parseInit
+
+    func testParseInitDefaults() throws {
+        let options = try ArgParser.parseInit([])
+        XCTAssertFalse(options.yes)
+        XCTAssertEqual(options.output, "simshot.yml")
+    }
+
+    func testParseInitYesAndOutput() throws {
+        let options = try ArgParser.parseInit(["--yes", "--output", "  out.yml  "])
+        XCTAssertTrue(options.yes)
+        XCTAssertEqual(options.output, "out.yml")
+    }
+
+    func testParseInitShortFlags() throws {
+        let options = try ArgParser.parseInit(["-y", "--output=out.yml"])
+        XCTAssertTrue(options.yes)
+        XCTAssertEqual(options.output, "out.yml")
+    }
+
+    func testParseInitRejectsEmptyOutput() {
+        XCTAssertThrowsError(try ArgParser.parseInit(["--output", "   "])) { error in
+            guard case SimshotError.usage = error else {
+                return XCTFail("expected usage, got \(error)")
+            }
+        }
+    }
+
+    func testParseInitRejectsUnknownFlag() {
+        XCTAssertThrowsError(try ArgParser.parseInit(["--bogus"])) { error in
+            guard case SimshotError.usage = error else {
+                return XCTFail("expected usage, got \(error)")
+            }
+        }
+    }
+
+    func testParseInitRejectsPositional() {
+        XCTAssertThrowsError(try ArgParser.parseInit(["foo"])) { error in
+            guard case SimshotError.usage = error else {
+                return XCTFail("expected usage, got \(error)")
+            }
+        }
+    }
 }

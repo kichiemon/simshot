@@ -16,6 +16,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- `simshot verify` and `simshot init` now trim surrounding whitespace from their
+  string option values (verify's root/`--devices`/`--langs`, init's `--output`)
+  and reject whitespace-only values, consistent with `simshot shoot`. Both also
+  reject path-like `--devices`/`--langs` entries. Parsing now lives in
+  `SimshotCore.ArgParser` (`parseVerify`/`parseInit`) so it is covered by tests.
+
 - `Simulator.runtimeComponents` now ignores the device-family suffix that newer
   Xcode runtimes append to their identifier (e.g.
   `com.apple.CoreSimulator.SimRuntime.iOS-27-2-iPhone19-4`). Previously every
