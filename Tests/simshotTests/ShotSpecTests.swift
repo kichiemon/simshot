@@ -111,4 +111,22 @@ extension ShotSpecTests {
             }
         }
     }
+
+    func testShotTrimsWhitespaceFromNameAndScene() throws {
+        let json = #"{ "name": "  04_home.png  ", "scene": "  home  " }"#
+        let data = json.data(using: .utf8)!
+        let shot = try JSONDecoder().decode(Shot.self, from: data)
+        XCTAssertEqual(shot.name, "04_home.png")
+        XCTAssertEqual(shot.scene, "home")
+    }
+
+    func testShotRejectsWhitespaceOnlyName() {
+        let json = #"{ "name": "   ", "scene": "home" }"#
+        XCTAssertThrowsError(try JSONDecoder().decode(Shot.self, from: json.data(using: .utf8)!)) { error in
+            guard case DecodingError.dataCorrupted = error else {
+                return XCTFail("expected dataCorrupted, got \(error)")
+            }
+        }
+    }
+
 }

@@ -61,8 +61,8 @@ public struct Shot: Codable, Equatable {
         wait: Int = 6,
         uiTesting: Bool = true
     ) {
-        self.name = name
-        self.scene = scene
+        self.name = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        self.scene = scene.trimmingCharacters(in: .whitespacesAndNewlines)
         self.strokes = strokes
         self.scrollBottom = scrollBottom
         self.wait = wait
@@ -76,7 +76,9 @@ public struct Shot: Codable, Equatable {
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         name = try container.decode(String.self, forKey: .name)
+            .trimmingCharacters(in: .whitespacesAndNewlines)
         scene = try container.decode(String.self, forKey: .scene)
+            .trimmingCharacters(in: .whitespacesAndNewlines)
         strokes = try container.decodeIfPresent(Int.self, forKey: .strokes)
         scrollBottom = try container.decodeIfPresent(Bool.self, forKey: .scrollBottom) ?? false
         wait = try container.decodeIfPresent(Int.self, forKey: .wait) ?? 6

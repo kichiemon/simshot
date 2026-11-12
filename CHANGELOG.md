@@ -16,6 +16,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- `Shot` config entries now trim surrounding whitespace from `name` and `scene`
+  (consistent with the CLI option trimming), so a config written with stray
+  spaces no longer produces a scene name with leading/trailing spaces or a
+  screenshot file name with spaces. Whitespace-only `name`/`scene` values are
+  rejected at decode time instead of slipping through.
+
 - `simshot verify` and `simshot init` now trim surrounding whitespace from their
   string option values (verify's root/`--devices`/`--langs`, init's `--output`)
   and reject whitespace-only values, consistent with `simshot shoot`. Both also
