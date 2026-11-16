@@ -16,6 +16,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- `DeviceSpec.matchTarget` now returns `nil` for non-positive dimensions
+  instead of computing a NaN aspect ratio that could produce a spurious
+  match or crash downstream callers.
+
 - `Shot` config entries now trim surrounding whitespace from `name` and `scene`
   (consistent with the CLI option trimming), so a config written with stray
   spaces no longer produces a scene name with leading/trailing spaces or a

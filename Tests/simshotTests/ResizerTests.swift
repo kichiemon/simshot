@@ -72,6 +72,12 @@ final class DeviceSpecTests: XCTestCase {
     func testMatchTargetReturnsNilForOddRatio() {
         XCTAssertNil(DeviceSpec.matchTarget(width: 500, height: 500))
     }
+
+    func testMatchTargetReturnsNilForNonPositiveDimensions() {
+        XCTAssertNil(DeviceSpec.matchTarget(width: 0, height: 100))
+        XCTAssertNil(DeviceSpec.matchTarget(width: 100, height: 0))
+        XCTAssertNil(DeviceSpec.matchTarget(width: -1, height: 100))
+    }
 }
 
 final class ResizerTests: XCTestCase {

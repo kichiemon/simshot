@@ -127,6 +127,10 @@ public enum DeviceSpec {
     ///    (e.g. the 4:3 iPads, and the iPad 10.2" raw size that Apple rejects).
     /// 2. Otherwise, the closest aspect ratio within 1%.
     public static func matchTarget(width: Int, height: Int) -> AppStoreTarget? {
+        // Dimensions must be positive; a zero/negative size is never an App
+        // Store screenshot and would otherwise produce NaN ratios or spurious
+        // matches.
+        guard width > 0, height > 0 else { return nil }
         let size = CGSize(width: width, height: height)
 
         for target in appStoreTargets {
