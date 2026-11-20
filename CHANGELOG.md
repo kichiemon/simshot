@@ -20,6 +20,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   instead of computing a NaN aspect ratio that could produce a spurious
   match or crash downstream callers.
 
+- `Simulator.installApp` and `Simulator.screenshot` no longer sleep after their
+  final failed attempt, so a failing capture reports promptly instead of
+  waiting an extra 1.5–2.0 s before throwing. Retry spacing between attempts
+  is unchanged.
+
 - `Shot` config entries now trim surrounding whitespace from `name` and `scene`
   (consistent with the CLI option trimming), so a config written with stray
   spaces no longer produces a scene name with leading/trailing spaces or a

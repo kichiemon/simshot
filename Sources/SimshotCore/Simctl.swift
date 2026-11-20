@@ -205,7 +205,9 @@ public struct Simulator: Equatable {
             if result.status == 0 { return }
             lastError = result.stderr
             Log.warn("⚠️  install attempt \(attempt) failed, retrying...")
-            Thread.sleep(forTimeInterval: 2.0)
+            if attempt < 2 {
+                Thread.sleep(forTimeInterval: 2.0)
+            }
         }
         throw SimshotError.commandFailed("simctl install failed for \(name):\n\(lastError)")
     }
@@ -253,7 +255,9 @@ public struct Simulator: Equatable {
             lastError = result.stderr
             Log.warn(
                 "⚠️  screenshot attempt \(attempt) failed: \(lastError.trimmingCharacters(in: .whitespacesAndNewlines))")
-            Thread.sleep(forTimeInterval: 1.5)
+            if attempt < max(1, retries) {
+                Thread.sleep(forTimeInterval: 1.5)
+            }
         }
         throw SimshotError.commandFailed("simctl screenshot failed on \(name):\n\(lastError)")
     }
