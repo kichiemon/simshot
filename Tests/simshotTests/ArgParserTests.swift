@@ -105,13 +105,14 @@ final class ArgParserTests: XCTestCase {
     }
 
     func testAppPathSkipsBuildRequirements() throws {
+        let app = try makeTempApp(bundleID: nil)
         let options = try ArgParser.parseShoot([
-            "--app-path", "/tmp/Build/Products/Debug-iphonesimulator/MyApp.app",
+            "--app-path", app.path,
             "--bundle-id", "com.example.myapp",
             "--devices", "iphone-17-pro-max",
             "--scenes", "home",
         ])
-        XCTAssertEqual(options.appPath?.path, "/tmp/Build/Products/Debug-iphonesimulator/MyApp.app")
+        XCTAssertEqual(options.appPath?.path, app.path)
         XCTAssertNil(options.scheme)
     }
 
@@ -501,6 +502,20 @@ final class ArgParserTests: XCTestCase {
         }
     }
 
+    func testAppPathNonexistentIsRejected() {
+        XCTAssertThrowsError(
+            try ArgParser.parseShoot([
+                "--app-path", "/tmp/does-not-exist-\\(UUID().uuidString).app",
+                "--bundle-id", "com.example.myapp",
+                "--devices", "iphone-17-pro-max",
+                "--scenes", "home",
+            ])
+        ) { error in
+            guard case SimshotError.usage = error else {
+                return XCTFail("expected usage, got \\(error)")
+            }
+        }
+    }
     func testExplicitBundleIDWinsOverAutoDetection() throws {
         let app = try makeTempApp(bundleID: "com.example.detected")
         let options = try ArgParser.parseShoot([
@@ -576,6 +591,14 @@ final class ArgParserTests: XCTestCase {
         XCTAssertThrowsError(try ArgParser.parseVerify(["--bogus"])) { error in
             guard case SimshotError.usage = error else {
                 return XCTFail("expected usage, got \(error)")
+            }
+        }
+    }
+
+    func testParseVerifyRejectsMultiplePositionals() {
+        XCTAssertThrowsError(try ArgParser.parseVerify(["first", "second"])) { error in
+            guard case SimshotError.usage = error else {
+                return XCTFail("expected usage, got \\(error)")
             }
         }
     }

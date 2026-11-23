@@ -16,6 +16,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- `ArgParser.parseVerify` now rejects more than one positional output
+  directory (previously the last one silently won). `parseVerify` and
+  `parseInit` also interpolate the offending token into their "Unexpected
+  positional argument", "Unknown option", and "Missing value" messages
+  instead of printing the literal `\\(raw)`/`\\(flag)`.
+
+- `ArgParser.parseShoot` now validates that `--app-path` points to an existing
+  directory, so a typo or a not-yet-built `.app` path fails at parse time with
+  an actionable message instead of being accepted and failing later during
+  install.
+
 - `DeviceSpec.matchTarget` now returns `nil` for non-positive dimensions
   instead of computing a NaN aspect ratio that could produce a spurious
   match or crash downstream callers.

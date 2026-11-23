@@ -99,7 +99,15 @@ public enum ArgParser {
                 guard !appPathValue.isEmpty else {
                     throw SimshotError.usage("--app-path must not be empty.")
                 }
-                options.appPath = URL(fileURLWithPath: appPathValue)
+                let appPathURL = URL(fileURLWithPath: appPathValue)
+                var isDirectory: ObjCBool = false
+                guard FileManager.default.fileExists(atPath: appPathURL.path, isDirectory: &isDirectory),
+                    isDirectory.boolValue
+                else {
+                    throw SimshotError.usage(
+                        "--app-path must point to an existing .app bundle (got '\(appPathValue)').")
+                }
+                options.appPath = appPathURL
             case "--bundle-id":
                 options.bundleID = try takeValue(for: flag, inline: inline, &index)
             case "--devices":
@@ -167,7 +175,7 @@ public enum ArgParser {
                 rawValue = inline
             } else {
                 guard index + 1 < args.count else {
-                    throw SimshotError.usage("Missing value for \\(flag)")
+                    throw SimshotError.usage("Missing value for \(flag)")
                 }
                 index += 1
                 rawValue = args[index]
@@ -175,6 +183,7 @@ public enum ArgParser {
             return rawValue.trimmingCharacters(in: .whitespacesAndNewlines)
         }
 
+        var rootSet = false
         while index < args.count {
             let raw = args[index]
             if raw.hasPrefix("--") || raw.hasPrefix("-") {
@@ -192,9 +201,13 @@ public enum ArgParser {
                 case "--json":
                     options.json = true
                 default:
-                    throw SimshotError.usage("Unknown option '\\(raw)'. Run `simshot verify --help`.")
+                    throw SimshotError.usage("Unknown option '\(raw)'. Run `simshot verify --help`.")
                 }
             } else {
+                guard !rootSet else {
+                    throw SimshotError.usage("Unexpected positional argument '\(raw)'")
+                }
+                rootSet = true
                 options.root = raw.trimmingCharacters(in: .whitespacesAndNewlines)
             }
             index += 1
@@ -235,7 +248,7 @@ public enum ArgParser {
                 rawValue = inline
             } else {
                 guard index + 1 < args.count else {
-                    throw SimshotError.usage("Missing value for \\(flag)")
+                    throw SimshotError.usage("Missing value for \(flag)")
                 }
                 index += 1
                 rawValue = args[index]
@@ -260,9 +273,9 @@ public enum ArgParser {
                 throw SimshotError.usage("help")
             default:
                 if raw.hasPrefix("--") || raw.hasPrefix("-") {
-                    throw SimshotError.usage("Unknown option '\\(raw)'. Run `simshot init --help`.")
+                    throw SimshotError.usage("Unknown option '\(raw)'. Run `simshot init --help`.")
                 } else {
-                    throw SimshotError.usage("Unexpected positional argument '\\(raw)'")
+                    throw SimshotError.usage("Unexpected positional argument '\(raw)'")
                 }
             }
             index += 1
