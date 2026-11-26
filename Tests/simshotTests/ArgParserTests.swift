@@ -516,6 +516,26 @@ final class ArgParserTests: XCTestCase {
             }
         }
     }
+
+    func testAppPathNonAppBundleIsRejected() throws {
+        let base = FileManager.default.temporaryDirectory
+            .appendingPathComponent("simshot-notapp-\\(UUID().uuidString)")
+        let dir = base.appendingPathComponent("NotAnApp")
+        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        addTeardownBlock { try? FileManager.default.removeItem(at: base) }
+        XCTAssertThrowsError(
+            try ArgParser.parseShoot([
+                "--app-path", dir.path,
+                "--bundle-id", "com.example.myapp",
+                "--devices", "iphone-17-pro-max",
+                "--scenes", "home",
+            ])
+        ) { error in
+            guard case SimshotError.usage = error else {
+                return XCTFail("expected usage, got \\(error)")
+            }
+        }
+    }
     func testExplicitBundleIDWinsOverAutoDetection() throws {
         let app = try makeTempApp(bundleID: "com.example.detected")
         let options = try ArgParser.parseShoot([

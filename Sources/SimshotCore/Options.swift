@@ -107,6 +107,10 @@ public enum ArgParser {
                     throw SimshotError.usage(
                         "--app-path must point to an existing .app bundle (got '\(appPathValue)').")
                 }
+                guard appPathURL.pathExtension.lowercased() == "app" else {
+                    throw SimshotError.usage(
+                        "--app-path must point to an .app bundle (got '\(appPathValue)').")
+                }
                 options.appPath = appPathURL
             case "--bundle-id":
                 options.bundleID = try takeValue(for: flag, inline: inline, &index)

@@ -22,6 +22,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   positional argument", "Unknown option", and "Missing value" messages
   instead of printing the literal `\\(raw)`/`\\(flag)`.
 
+- `ArgParser.parseShoot` now requires `--app-path` to point at a bundle whose
+  name ends in `.app`, so a directory that happens to exist but is not an app
+  bundle is rejected at parse time with an actionable message instead of being
+  accepted and failing later during install or bundle-id detection.
+
 - `ArgParser.parseShoot` now validates that `--app-path` points to an existing
   directory, so a typo or a not-yet-built `.app` path fails at parse time with
   an actionable message instead of being accepted and failing later during
